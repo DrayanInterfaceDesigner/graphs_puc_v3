@@ -31,13 +31,6 @@ graph.add_edge('C', 'E', 3)
 
 # graph.remove_vertice('D')
 
-<<<<<<< Updated upstream
-print(
-    f'A out degree: {graph.out_degree("A")}',
-    f'B out degree: {graph.out_degree("B")}',
-    f'C out degree: {graph.out_degree("C")}',
-)
-=======
 # print(graph.get_weight('A', 'B'))
 # graph.set_weight('A', 'B', 50)
 # graph.set_weight('C', 'A', 25)
@@ -48,7 +41,6 @@ print(
 #     f'B out degree: {graph.out_degree("B")}',
 #     f'C out degree: {graph.out_degree("C")}',
 # )
->>>>>>> Stashed changes
 
 # print(
 #     f'A in degree: {graph.in_degree("A")}',
@@ -62,11 +54,7 @@ print(
 #     f'C degree: {graph.degree("C")}',
 # )
 
-<<<<<<< Updated upstream
-print(graph.get_adjacent('A'))
-=======
 print(graph.get_adjacencies('C'))
->>>>>>> Stashed changes
 
 print(graph)
 

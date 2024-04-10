@@ -27,15 +27,10 @@ class Graph:
         if not self.find_vertice(name):
             self.vertices.append({len(self.vertices): name})
     
-<<<<<<< Updated upstream
-    def add_edge(self, parent:str, child:str, weight:int=1) -> None:
-        self.connections.append({'parent': parent, 'child': child, 'weight': weight})
-=======
     def add_edge(self, parent:str, child:str, weight:int|float=1) -> None:
         w:int|float = 1 if not self.weighted else weight
         self.connections.append({'parent': parent, 'child': child, 'weight': w})
         self.connections.append({'parent': child, 'child': parent, 'weight': w})
->>>>>>> Stashed changes
     
     def remove_vertice(self, name:str ) -> None:
         to_remove:list = []
@@ -143,8 +138,6 @@ class Graph:
 
         return visited, total_time
     
-<<<<<<< Updated upstream
-=======
     # dijkstra helper, determines min cost vertice
     def extract_min(self, q, costs):
         min_cost_vertice = None
@@ -155,7 +148,6 @@ class Graph:
                 min_cost_vertice = vertice
         return min_cost_vertice
 
->>>>>>> Stashed changes
     def dijkstra(self, start:str, end:str) -> int:
         if not self.find_vertice(start) or not self.find_vertice(end):
             return 0
