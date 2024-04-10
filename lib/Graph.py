@@ -14,14 +14,25 @@ class Graph:
             if list(vertice.values())[0] == name:
                 return vertice
         return None
+    
+    def find_edge(self, vertice_a:str, vertice_b:str) -> bool:
+        for connection in self.connections:
+            if ((connection['parent'] == vertice_a and connection['child'] == vertice_b) or 
+                (connection['parent'] == vertice_b and connection['child'] == vertice_a)):
+                return True
+            else: 
+                return False
+                
 
     def add_vertice(self, name:str) -> None:
         if not self.find_vertice(name):
             self.vertices.append({len(self.vertices): name})
     
-    def add_edge(self, parent:str, child:str, weight:int=1) -> None:
-        self.connections.append({'parent': parent, 'child': child, 'weight': weight})
+    def add_edge(self, parent:str, child:str, weight:int|float=1) -> None:
+        w:int|float = 1 if not self.weighted else weight
+        self.connections.append({'parent': parent, 'child': child, 'weight': w})
     
+
     def remove_vertice(self, name:str ) -> None:
         to_remove:list = []
         for connection in self.connections:
@@ -46,7 +57,7 @@ class Graph:
             self.connections.remove(connection)
         
 
-    def get_adjacent(self, vertice:str) -> list:
+    def get_adjacencies(self, vertice:str) -> list:
         adjacent:list = []
         for connection in self.connections:
             if connection['parent'] == vertice:
@@ -57,6 +68,30 @@ class Graph:
         adjacent = list(set(adjacent))
         return adjacent
     
+
+    def get_weight(self, vertice_a:str, vertice_b:str) -> (int|float|None):
+        if not self.weighted:
+            return 1
+        elif not self.find_edge(vertice_a, vertice_b):
+            return None
+        else:
+            for connection in self.connections:
+                if connection['parent'] == vertice_a and connection['child'] == vertice_b:
+                    return connection['weight']
+                
+    def set_weight(self, vertice_a:str, vertice_b:str, weight:int|float) -> None:
+        if self.weighted:
+            if not self.find_edge(vertice_a, vertice_b):
+                self.add_edge(vertice_a, vertice_b, weight)
+            else:
+                for connection in self.connections:
+                    if connection['parent'] == vertice_a and connection['child'] == vertice_b:
+                        connection['weight'] = weight
+        else:
+            if not self.find_edge(vertice_a, vertice_b):
+                self.add_edge(vertice_a, vertice_b)
+
+
     def out_degree(self, vertice:str) -> int:
         degree:int = 0
         for connection in self.connections:
@@ -77,12 +112,7 @@ class Graph:
         else:
             return self.in_degree(vertice)
     
-    def is_adjacent(self, vertice1:str, vertice2:str) -> bool:
-        for connection in self.connections:
-            if connection['parent'] == vertice1 and connection['child'] == vertice2:
-                return True
-        return False
-    
+
     def dijkstra(self, start:str, end:str) -> int:
         pass
 

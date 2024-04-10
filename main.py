@@ -55,5 +55,7 @@ graph.to_string_list()
 print(graph.get_adjacencies('A'))
 print(graph.get_adjacencies('B'))
 print(graph.get_adjacencies('C'))
+=======
+print(graph.get_adjacencies('A'))
 
 print(graph)
