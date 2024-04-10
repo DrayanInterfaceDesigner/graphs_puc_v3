@@ -321,9 +321,9 @@ if __name__ == '__main__':
 
     caminho, custo = g.dijkstra('A', 'E')
     print(f'Menor caminho entre A e E: {caminho} com custo = {custo}')
-    # print('Prim MST')
-    # g_mst, custo = g.prim()
-    # print(f'MST = {g_mst}\n custo = {custo}')
+    print('Prim MST')
+    g_mst, custo = g.prim()
+    print(f'MST = {g_mst}\n custo = {custo}')
 
 
 

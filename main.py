@@ -29,12 +29,12 @@ graph.add_edge('C', 'E', 3)
 # graph.remove_vertice('A')
 # graph.remove_edge('A', 'B')
 
-graph.remove_vertice('D')
+# graph.remove_vertice('D')
 
-print(graph.get_weight('A', 'B'))
-graph.set_weight('A', 'B', 50)
-graph.set_weight('C', 'A', 25)
-print(graph.get_weight('A', 'B'))
+# print(graph.get_weight('A', 'B'))
+# graph.set_weight('A', 'B', 50)
+# graph.set_weight('C', 'A', 25)
+# print(graph.get_weight('A', 'B'))
 
 # print(graph.get_weight('A', 'B'))
 # graph.set_weight('A', 'B', 50)
@@ -76,5 +76,8 @@ print(graph.vertices)
 path, cost, time = graph.dijkstra('A', 'E')
 print(f"Shortest path between A and E: {path} with cost: {cost}. found in time: {time}")
 
+print('Prim MST')
+g_mst, custo = graph.prim()
+print(f'MST = {g_mst}\n custo = {custo}')
 
 print(graph)

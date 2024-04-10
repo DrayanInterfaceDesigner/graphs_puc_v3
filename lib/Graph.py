@@ -214,8 +214,48 @@ class Graph:
         return path, total_cost, total_time
 
 
+    def is_connected(self):
+        # TODO: fazer funsionar
+        return True
+
+    def prim(self):
+        if self.is_connected():
+            predecessors = {}
+            weights = {}
+            named_vertices = [list(x.values())[0] for x in self.vertices]
+
+            for vertice in named_vertices:
+                predecessors[vertice] = None
+                weights[vertice] = 1e10
+            q = [x for x in named_vertices]
+            while len(q) > 0:
+                u = self.extract_min(q, weights)
+                q.remove(u)
+
+                for adjacency in self.get_adjacencies(u):
+                    weight = self.get_weight(u, adjacency)
+                    if adjacency in q and weight < weights[adjacency]:
+                        predecessors[adjacency] = u
+                        weights[adjacency] = weight
+
+            Prim_Graph = Graph(False, True, self.representation)
+
+            for vertice in named_vertices:
+                Prim_Graph.add_vertice(vertice)
+
+            cost = 0
+            for start_vertice in predecessors.keys():
+                end_vertice = predecessors[start_vertice]
+                if end_vertice is not None:
+                    Prim_Graph.add_edge(start_vertice, end_vertice, weights[start_vertice])
+                    cost += weights[start_vertice]
+
+            return Prim_Graph, cost
+
+
     def warshall(self) -> list:
         pass
+
 
     def generate_nodes_string(self) -> str:
         vertices:list = []
