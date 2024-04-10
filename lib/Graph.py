@@ -61,8 +61,8 @@ class Graph:
         pass
     
     def __str__(self) -> str:
-        pass
+        return f"Graph: {self.vertices} {self.connections}"
 
     def __repr__(self) -> str:
-        pass
+        return f"Graph: {self.vertices} {self.connections}"
 

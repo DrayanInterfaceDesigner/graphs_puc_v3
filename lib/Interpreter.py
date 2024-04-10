@@ -30,7 +30,7 @@ class Interpreter:
     def interpret_vertices(self, graph:Graph, parsed_vertices:dict) -> None:
         for vertice in parsed_vertices:
             for index, name in vertice.items():
-                graph.add_vertex(name)
+                graph.add_vertice(name)
     
     def interpret_edges(self, graph:Graph, parsed:dict) -> None:
         print(parsed)
