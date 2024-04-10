@@ -28,8 +28,9 @@ class Graph:
         if not self.find_vertice(name):
             self.vertices.append({len(self.vertices): name})
     
-    def add_edge(self, parent:str, child:str, weight:int=1) -> None:
-        self.connections.append({'parent': parent, 'child': child, 'weight': weight})
+    def add_edge(self, parent:str, child:str, weight:int|float=1) -> None:
+        w:int|float = 1 if not self.weighted else weight
+        self.connections.append({'parent': parent, 'child': child, 'weight': w})
     
 
     def remove_vertice(self, name:str ) -> None:
