@@ -60,14 +60,10 @@ print(graph.get_weight('A', 'B'))
 # )
 
 
-graph.to_string_list()
-
 print(graph.get_adjacencies('A'))
 print(graph.get_adjacencies('B'))
 print(graph.get_adjacencies('C'))
 print(graph.get_adjacencies('A'))
-
-print(graph)
 
 print("depth search A -> E")
 print(graph.depth_search('A', 'E'))
@@ -80,3 +76,5 @@ print(graph.vertices)
 path, cost, time = graph.dijkstra('A', 'E')
 print(f"Shortest path between A and E: {path} with cost: {cost}. found in time: {time}")
 
+
+print(graph)

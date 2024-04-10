@@ -114,7 +114,7 @@ class Graph:
 
     def depth_search(self, start:str, end:str) -> int:
         if not self.find_vertice(start) or not self.find_vertice(end):
-            return 0a
+            return 0
         
         start_time = time.perf_counter()
 
