@@ -253,7 +253,13 @@ class Graph:
 
 
     def warshall(self) -> list:
-        pass
+        matrix = self.generate_matrix()
+        for k in range(len(matrix)):
+            for i in range(len(matrix)):
+                for j in range(len(matrix)):
+                    matrix[i][j] = matrix[i][j] or (matrix[i][k] and matrix[k][j])
+        
+        return matrix
 
 
     def generate_nodes_string(self) -> str:

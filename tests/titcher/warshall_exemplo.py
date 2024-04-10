@@ -22,6 +22,8 @@ def warshall(matriz):
     # matriz de fechamento transitivo
     mat_warshall = copia_matriz(matriz)
 
+    print("NARGOLAAAAAAAAAAAAAA\n", mat_warshall)
+
     for k in range(len(mat_warshall)):
         for i in range(len(mat_warshall)):
             for j in range(len(mat_warshall)):
