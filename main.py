@@ -26,6 +26,24 @@ graph.add_edge('B', 'C', 5)
 
 graph.remove_vertice('D')
 
+print(
+    f'A out degree: {graph.out_degree("A")}',
+    f'B out degree: {graph.out_degree("B")}',
+    f'C out degree: {graph.out_degree("C")}',
+)
+
+print(
+    f'A in degree: {graph.in_degree("A")}',
+    f'B in degree: {graph.in_degree("B")}',
+    f'C in degree: {graph.in_degree("C")}',
+)
+
+print(
+    f'A degree: {graph.degree("A")}',
+    f'B degree: {graph.degree("B")}',
+    f'C degree: {graph.degree("C")}',
+)
+
 print(graph.get_adjacent('A'))
 
 print(graph)
