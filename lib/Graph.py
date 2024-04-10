@@ -2,30 +2,59 @@
 
 class Graph:
     def __init__(self, directed:bool, weighted:bool, representation:str) -> None:
-        self.vertices:list = [{0: 'A'}, {1: 'B'}, {2: 'C'}, {3: 'D'}, {4: 'E'}, {5: 'F'}, {6: 'G'}, {7: 'H'}, {8: 'I'}, {9: 'J'}]
+        self.vertices:list = []
         self.connections:list = []
         self.directed:bool = directed
         self.weighted:bool = weighted
         self.representation:str = representation
     
+
+    def find_vertice(self, name:str) -> dict:
+        for vertice in self.vertices:
+            if list(vertice.values())[0] == name:
+                return vertice
+        return None
+
     def add_vertice(self, name:str) -> None:
-        if name not in self.vertices:
-            self.vertices.append(name)
+        if not self.find_vertice(name):
+            self.vertices.append({len(self.vertices): name})
     
     def add_edge(self, parent:str, child:str, weight:int=1) -> None:
         self.connections.append({'parent': parent, 'child': child, 'weight': weight})
     
-    def remove_vertice(self, name:str) -> None:
-        pass
+    def remove_vertice(self, name:str ) -> None:
+        to_remove:list = []
+        for connection in self.connections:
+            if connection['parent'] == name or connection['child'] == name:
+                to_remove.append(connection)
+        
+        for connection in to_remove:
+            self.connections.remove(connection)
+        
+        self.vertices = [vertice for vertice in self.vertices if list(vertice.values())[0] != name]
     
-    def remove_edge(self, vertice:str) -> None:
-        pass
+    def remove_edge(self, vertice_a:str, vertice_b:str) -> None:
+        to_remove:list = []
+
+        for connection in self.connections:
+            if connection['parent'] == vertice_a and connection['child'] == vertice_b:
+                to_remove.append(connection)
+            elif connection['parent'] == vertice_b and connection['child'] == vertice_a:
+                to_remove.append(connection)
+            
+        for connection in to_remove:
+            self.connections.remove(connection)
+        
 
     def get_adjacent(self, vertice:str) -> list:
         adjacent:list = []
         for connection in self.connections:
             if connection['parent'] == vertice:
                 adjacent.append(connection['child'])
+            elif connection['child'] == vertice:
+                adjacent.append(connection['parent'])
+        
+        adjacent = list(set(adjacent))
         return adjacent
     
     def out_degree(self, vertice:str) -> int:
@@ -61,8 +90,8 @@ class Graph:
         pass
     
     def __str__(self) -> str:
-        return f"Graph: {self.vertices} {self.connections}"
+        return f"Graph: v: {self.vertices} c: {self.connections}"
 
     def __repr__(self) -> str:
-        return f"Graph: {self.vertices} {self.connections}"
+        return f"Graph: v: {self.vertices} c: {self.connections}"
 
