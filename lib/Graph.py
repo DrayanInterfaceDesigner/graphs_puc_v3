@@ -67,6 +67,30 @@ class Graph:
         adjacent = list(set(adjacent))
         return adjacent
     
+
+    def get_weight(self, vertice_a:str, vertice_b:str) -> (int|float|None):
+        if not self.weighted:
+            return 1
+        elif not self.find_edge(vertice_a, vertice_b):
+            return None
+        else:
+            for connection in self.connections:
+                if connection['parent'] == vertice_a and connection['child'] == vertice_b:
+                    return connection['weight']
+                
+    def set_weight(self, vertice_a:str, vertice_b:str, weight:int|float) -> None:
+        if self.weighted:
+            if not self.find_edge(vertice_a, vertice_b):
+                self.add_edge(vertice_a, vertice_b, weight)
+            else:
+                for connection in self.connections:
+                    if connection['parent'] == vertice_a and connection['child'] == vertice_b:
+                        connection['weight'] = weight
+        else:
+            if not self.find_edge(vertice_a, vertice_b):
+                self.add_edge(vertice_a, vertice_b)
+
+
     def out_degree(self, vertice:str) -> int:
         degree:int = 0
         for connection in self.connections:
@@ -90,7 +114,7 @@ class Graph:
 
     def depth_search(self, start:str, end:str) -> int:
         if not self.find_vertice(start) or not self.find_vertice(end):
-            return 0
+            return 0a
         
         start_time = time.perf_counter()
 
@@ -192,9 +216,65 @@ class Graph:
 
     def warshall(self) -> list:
         pass
+
+    def generate_nodes_string(self) -> str:
+        vertices:list = []
+        vertices_str:str = "Nodes: \n"
+
+        for vertice in self.vertices:
+            vertices.append(f"{list(vertice.values())[0]} ({list(vertice.keys())[0]})")
+        
+        vertices_str += ', '.join(vertices)
+        return vertices_str
+
+
+    def to_string_matrix(self) -> str:
+        connections_str:str = "Edges: \n"
+        final_string:str = ""
+        binary_adjacencies:list = []
+
+        list(self.vertices[0].values())[0]
+
+        for vertice in self.vertices:
+
+            slots:list = ['0'] * len(self.vertices)
+            va:str = list(vertice.values())[0]
+            
+            for vb in self.vertices:
+                _b:str = list(vb.values())[0]
+                adjacencies:list = self.get_adjacencies(_b)
+                if va in adjacencies:
+                    slots[self.vertices.index(vb)] = '1'
+                    
+            text:str = f"{va} ({list(vertice.keys())[0]}): {' '.join(slots)}"
+            binary_adjacencies.append(text)
+        
+        final_string += "\n" + self.generate_nodes_string() + "\n"
+        final_string += "\n" + connections_str
+        final_string += '\n'.join(binary_adjacencies)
+
+        return final_string
+
+    def to_string_list(self) -> str:
+
+        connections_str:str = "Edges: \n"
+        final_string:str = ""
+        adjacencies:list = [(v, self.get_adjacencies(list(v.values())[0])) for v in self.vertices]
+
+        for adjacency in adjacencies:
+            parent:str = list(adjacency[0].values())[0]
+            parent_index:str = list(adjacency[0].keys())[0]
+            connections_str+= f"{parent} ({parent_index}): {', '.join(adjacency[1])}\n"
+                
+        final_string += "\n" + self.generate_nodes_string() + "\n"
+        final_string += "\n" + connections_str
+
+        return final_string
     
     def __str__(self) -> str:
-        return f"Graph: v: {self.vertices} c: {self.connections}"
+        if self.representation == 'MATRIZ':
+            return self.to_string_matrix()
+        return self.to_string_list()
 
     def __repr__(self) -> str:
         return f"Graph: v: {self.vertices} c: {self.connections}"
