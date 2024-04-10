@@ -16,7 +16,7 @@ class Parser:
     
     def save(self, graph) -> None:
         date:str = datetime.now().strftime("%Y%m%d%H%M%S")
-        output:str = f"directed_{graph.directed}_weighted_{graph.weighted}_representation_{graph.representation}_{date}.net"
+        output:str = f"data/directed_{graph.directed}_weighted_{graph.weighted}_representation_{graph.representation}_{date}.net"
         with open(output, 'w') as file:
             file.write(graph.to_pajek())
         

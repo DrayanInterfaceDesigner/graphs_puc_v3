@@ -2,7 +2,7 @@ from lib.Parser import Parser
 from lib.Interpreter import Interpreter
 from lib.Graph import Graph
 
-parser: Parser = Parser("tests/matrix.net")
+parser: Parser = Parser("data/matrix.net")
 interpreter: Interpreter = Interpreter()
 extraction:dict = parser.parse()
 
@@ -84,6 +84,7 @@ print(graph)
 
 parser.save(graph)
 
+graph.degree_distribution_histogram()
 
 print(graph.generate_matrix())
 

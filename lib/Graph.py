@@ -21,8 +21,7 @@ class Graph:
     
     def find_edge(self, vertice_a:str, vertice_b:str) -> bool:
         for connection in self.connections:
-            if ((connection['parent'] == vertice_a and connection['child'] == vertice_b) or 
-                (connection['parent'] == vertice_b and connection['child'] == vertice_a)):
+            if (connection['parent'] == vertice_a and connection['child'] == vertice_b):
                 return True
         return False
                 
@@ -33,7 +32,8 @@ class Graph:
     def add_edge(self, parent:str, child:str, weight:int|float=1) -> None:
         w:int|float = 1 if not self.weighted else weight
         self.connections.append({'parent': parent, 'child': child, 'weight': w})
-        self.connections.append({'parent': child, 'child': parent, 'weight': w})
+        if not self.directed:
+            self.connections.append({'parent': child, 'child': parent, 'weight': w})
     
     def remove_vertice(self, name:str ) -> None:
         to_remove:list = []
@@ -218,7 +218,12 @@ class Graph:
 
 
     def is_connected(self):
-        # TODO: fazer funsionar
+        warshall = self.warshall()
+        matrix = warshall.matrix
+        for i in range(len(matrix)):
+            for j in range(len(matrix)):
+                if matrix[i][j] == 0:
+                    return False  
         return True
 
     def prim(self):
@@ -255,9 +260,25 @@ class Graph:
 
             return Prim_Graph, cost
 
+    def eulerian(self):
+        vertices_list: list = [list(x.values())[0] for x in self.vertices]
 
-    def warshall(self) -> list:
-        matrix = self.generate_matrix()
+        if self.directed:
+            for vertice in vertices_list:
+                if self.in_degree(vertice) != self.out_degree(vertice):
+                    return False
+            if self.is_connected():
+                return True
+        else:
+            if self.is_connected():
+                for vertice in vertices_list:
+                    if self.degree(vertice) % 2 != 0:
+                        return False
+                return True
+            return False
+
+    def warshall(self):
+        matrix: list = self.generate_matrix()
 
         for k in range(len(matrix)):
             for i in range(len(matrix)):
@@ -292,8 +313,10 @@ class Graph:
             
             for vb in self.vertices:
                 _b:str = list(vb.values())[0]
-                adjacencies:list = self.get_adjacencies(_b)
-                if va in adjacencies:
+                # adjacencies:list = self.find_edge(_b)
+                # if va in adjacencies:
+                #     slots[self.vertices.index(vb)] = 1
+                if self.find_edge(va, _b):
                     slots[self.vertices.index(vb)] = 1
 
             matrix.append(slots)
@@ -301,11 +324,24 @@ class Graph:
         return matrix
     
     def from_matrix_update(self) -> None:
-        self.connections = []
+        self.connections: list = []
         for i in range(len(self.matrix)):
             for j in range(len(self.matrix)):
                 if self.matrix[i][j] == 1:
                     self.add_edge(list(self.vertices[i].values())[0], list(self.vertices[j].values())[0])
+
+    def degree_distribution_histogram(self):
+        vertices_list: list = [list(x.values())[0] for x in self.vertices]
+        degrees: list = [self.degree(x) for x in vertices_list]
+
+        plt.hist(degrees, bins=range(min(degrees), max(degrees) + 1), alpha=0.7, color='purple', edgecolor='cyan')
+        plt.title('Degree Distribution')
+        plt.xlabel('Degree')
+        plt.ylabel('Frequency')
+        plt.savefig("degree_distribution.png")
+        plt.show()
+
+        print(degrees)
 
     def to_string_matrix(self) -> str:
         connections_str:str = "Edges: \n"
