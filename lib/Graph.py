@@ -311,6 +311,35 @@ class Graph:
 
         return final_string
     
+
+    def to_pajek(self):
+
+        final_string:str = ""
+
+        configuration:str = ""
+        configuration+= f"% directed={self.directed}\n"
+        configuration+= f"% weighted={self.weighted}\n"
+        repr_key:str = "adjacency_matrix" if self.representation == "MATRIZ" else "edge_list"
+        configuration+= f"% representation={repr_key}\n"
+
+        vertices:str = ""
+        vertices+= f"*Vertices\n"
+        vertices+= '\n'.join([' '.join([str(list(v.keys())[0]), list(v.values())[0]]) for v in self.vertices])
+
+        edges:str = ""
+        edges+= f"*arcs\n"
+        edges+= '\n'.join([' '.join([str(v['parent']), str(v['child']), str(v['weight']) if self.weighted else ''])  for v in self.connections])
+
+        final_string+= configuration
+        final_string+= vertices
+        final_string+="\n\n"
+        final_string+=edges
+
+        return final_string
+
+
+
+
     def __str__(self) -> str:
         if self.representation == 'MATRIZ':
             return self.to_string_matrix()
