@@ -1,0 +1,17 @@
+% directed=true
+% weighted=true
+% representation=MATRIZ
+*Vertices 4
+0 A
+1 D
+2 B
+3 C
+*edges
+0 1 9
+0 2 8
+0 3 6
+1 0 42
+1 2 1
+2 0 233
+2 1 44
+3 0 5
