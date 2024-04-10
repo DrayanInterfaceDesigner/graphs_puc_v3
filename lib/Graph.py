@@ -259,6 +259,8 @@ class Graph:
                     cost += weights[start_vertice]
 
             return Prim_Graph, cost
+        else: 
+            return "Graph is not connected"
 
     def eulerian(self):
         vertices_list: list = [list(x.values())[0] for x in self.vertices]

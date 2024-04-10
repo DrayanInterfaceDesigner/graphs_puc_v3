@@ -145,8 +145,15 @@ def test_print():
     graph.add_edge('A', 'C', 4)
     graph.add_edge('B', 'C', 6)
 
-    print('GRAPH', graph)
-    print('GRAPH LIST', graph_list)
+    graph_list.add_vertice('A')
+    graph_list.add_vertice('B')
+    graph_list.add_vertice('C')
+    graph_list.add_edge('A', 'B', 2)
+    graph_list.add_edge('A', 'C', 4)
+    graph_list.add_edge('B', 'C', 6)
+
+    print('MATRIX GRAPH', graph)
+    print('\nLIST GRAPH', graph_list)
 
 def test_persistency():
     print(f'\n =========== Test for persistency =========== \n')
@@ -160,6 +167,8 @@ def test_persistency():
     graph.add_edge('B', 'C', 6)
 
     parser.save(graph)
+
+    print("Check data folder!")
 
 def test_transitive_closure():
     print(f'\n =========== Test for transitive closure =========== \n')
@@ -181,32 +190,90 @@ def test_search_algorithms():
 
     graph = Graph(False, True, 'MATRIZ')
 
+    graph.add_vertice('A')
+    graph.add_vertice('A')
+    graph.add_vertice('B')
+    graph.add_vertice('C')
+    graph.add_vertice('D')
+    graph.add_vertice('E')
+    graph.add_edge('A', 'B', 2)
+    graph.add_edge('A', 'C', 4)
+    graph.add_edge('B', 'C', 6)
+    graph.add_edge('D', 'C', 1)
+    graph.add_edge('D', 'E', 2)
+    graph.add_edge('C', 'E', 3)
+
+    print("Depth-first search from A -> E:\n")
+    path, time = graph.depth_search('A', 'E')
+    print(f"Shortest path between A and E: {path}. found in time: {time}\n\n")
+
+    print("Width-first search from A -> E:\n")
+    path, time = graph.width_search('A', 'E')
+    print(f"Shortest path between A and E: {path}. found in time: {time}\n\n")
+
+    print("Dijkstra's algorithm:\n")
+    path, cost, time = graph.dijkstra('A', 'E')
+    print(f"Shortest path between A and E: {path} with cost: {cost}. found in time: {time}")
+
 
 def test_eulerian():
     print(f'\n =========== Test for eulerian =========== \n')
 
-    pass
+    graph = Graph(True, True, 'MATRIZ')
+
+    graph.add_vertice('A')
+    graph.add_vertice('A')
+    graph.add_vertice('B')
+    graph.add_vertice('C')
+    graph.add_vertice('D')
+    graph.add_vertice('E')
+    graph.add_edge('A', 'B', 2)
+    graph.add_edge('A', 'C', 4)
+    graph.add_edge('B', 'C', 6)
+    graph.add_edge('D', 'C', 1)
+    graph.add_edge('D', 'E', 2)
+    graph.add_edge('C', 'E', 3)
+
+    print(graph)
+    print("\nIs eulerian: ", graph.eulerian())
 
 def test_prim():
     print(f'\n =========== Test for prim =========== \n')
 
-    pass
+    graph = Graph(False, True, 'LISTA')
+
+    graph.add_vertice('A')
+    graph.add_vertice('A')
+    graph.add_vertice('B')
+    graph.add_vertice('C')
+    graph.add_vertice('D')
+    graph.add_vertice('E')
+    graph.add_edge('A', 'B', 2)
+    graph.add_edge('B', 'C', 4)
+    graph.add_edge('C', 'D', 6)
+    graph.add_edge('D', 'E', 7)
+    graph.add_edge('E', 'A', 2)
+    graph.add_edge('C', 'E', 3)
+
+    prim_graph, cost = graph.prim()
+    print(f'MST: {prim_graph}\n cost = {cost}')
 
 def test_degree_distribution_histogram():
     print(f'\n =========== Test for degree distribution histogram =========== \n')
 
-    graph = Graph(False, True, 'MATRIZ')
+    graph = Graph(True, True, 'MATRIZ')
 
     graph.add_vertice('A')
     graph.add_vertice('B')
     graph.add_vertice('C')
     graph.add_vertice('D')
+    graph.add_vertice('E')
 
     graph.add_edge('A', 'B')
     graph.add_edge('A', 'C')
     graph.add_edge('A', 'D')
     graph.add_edge('B', 'C')
-    graph.add_edge('B', 'D')
+    graph.add_edge('B', 'E')
 
     graph.degree_distribution_histogram()
 
