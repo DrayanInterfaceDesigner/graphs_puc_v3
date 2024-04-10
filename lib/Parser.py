@@ -1,5 +1,8 @@
+from datetime import datetime
+
 class Parser:
-    def __init__(self) -> None:
+    def __init__(self, file:str) -> None:
+        self.file:str = file
         self.lines:list = []
         self.configs:list = []
         self.vertices:list = []
@@ -10,6 +13,12 @@ class Parser:
         with open(path) as file:
             # store the lines in the class
             self.lines = file.readlines()
+    
+    def save(self, graph) -> None:
+        date:str = datetime.now().strftime("%Y%m%d%H%M%S")
+        output:str = f"directed_{graph.directed}_weighted_{graph.weighted}_representation_{graph.representation}_{date}.net"
+        with open(output, 'w') as file:
+            file.write(graph.to_pajek())
         
     def reset(self) -> None:
         self.lines = []
@@ -90,7 +99,10 @@ class Parser:
                 elif line == "EDGES" or line == "ARCS":
                     self.parse_edges(i+1)
     
-    def parse(self, path:str) -> dict:
+    def parse(self, path:str='') -> dict:
+
+        if path == '':
+            path = self.file
         # reset the class just in case
         self.reset()
 

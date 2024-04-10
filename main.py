@@ -2,9 +2,9 @@ from lib.Parser import Parser
 from lib.Interpreter import Interpreter
 from lib.Graph import Graph
 
-parser: Parser = Parser()
+parser: Parser = Parser("tests/matrix.net")
 interpreter: Interpreter = Interpreter()
-extraction:dict = parser.parse("tests/matrix.net")
+extraction:dict = parser.parse()
 
 # print(interpreter.build(extraction))
 
@@ -78,3 +78,5 @@ print(f"Shortest path between A and E: {path} with cost: {cost}. found in time: 
 
 
 print(graph)
+
+parser.save(graph)
