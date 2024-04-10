@@ -1,5 +1,6 @@
 import time
 import matplotlib.pyplot as plt
+from copy import deepcopy
 
 class Graph:
     def __init__(self, directed:bool, weighted:bool, representation:str) -> None:
@@ -8,6 +9,9 @@ class Graph:
         self.directed:bool = directed
         self.weighted:bool = weighted
         self.representation:str = representation
+
+        self.matrix:list = []
+            
 
     def find_vertice(self, name:str) -> dict:
         for vertice in self.vertices:
@@ -254,12 +258,17 @@ class Graph:
 
     def warshall(self) -> list:
         matrix = self.generate_matrix()
+
         for k in range(len(matrix)):
             for i in range(len(matrix)):
                 for j in range(len(matrix)):
                     matrix[i][j] = matrix[i][j] or (matrix[i][k] and matrix[k][j])
         
-        return matrix
+        new_graph: Graph = deepcopy(self)
+        new_graph.matrix = matrix
+        new_graph.from_matrix_update()
+
+        return new_graph
 
 
     def generate_nodes_string(self) -> str:
@@ -286,10 +295,17 @@ class Graph:
                 adjacencies:list = self.get_adjacencies(_b)
                 if va in adjacencies:
                     slots[self.vertices.index(vb)] = 1
-                    
+
             matrix.append(slots)
         
         return matrix
+    
+    def from_matrix_update(self) -> None:
+        self.connections = []
+        for i in range(len(self.matrix)):
+            for j in range(len(self.matrix)):
+                if self.matrix[i][j] == 1:
+                    self.add_edge(list(self.vertices[i].values())[0], list(self.vertices[j].values())[0])
 
     def to_string_matrix(self) -> str:
         connections_str:str = "Edges: \n"

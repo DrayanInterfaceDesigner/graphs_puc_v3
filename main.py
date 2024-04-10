@@ -86,3 +86,5 @@ parser.save(graph)
 
 
 print(graph.generate_matrix())
+
+graph.warshall()
