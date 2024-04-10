@@ -26,6 +26,11 @@ graph.add_edge('B', 'C', 5)
 
 graph.remove_vertice('D')
 
+print(graph.get_weight('A', 'B'))
+graph.set_weight('A', 'B', 50)
+graph.set_weight('C', 'A', 25)
+print(graph.get_weight('A', 'B'))
+
 print(
     f'A out degree: {graph.out_degree("A")}',
     f'B out degree: {graph.out_degree("B")}',
@@ -44,6 +49,6 @@ print(
     f'C degree: {graph.degree("C")}',
 )
 
-print(graph.get_adjacent('A'))
+print(graph.get_adjacencies('A'))
 
 print(graph)
