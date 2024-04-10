@@ -14,7 +14,15 @@ class Graph:
             if list(vertice.values())[0] == name:
                 return vertice
         return None
-
+    
+    def find_edge(self, vertice_a:str, vertice_b:str) -> bool:
+        for connection in self.connections:
+            if ((connection['parent'] == vertice_a and connection['child'] == vertice_b) or 
+                (connection['parent'] == vertice_b and connection['child'] == vertice_a)):
+                return True
+            else: 
+                return False
+                
     def add_vertice(self, name:str) -> None:
         if not self.find_vertice(name):
             self.vertices.append({len(self.vertices): name})
@@ -46,7 +54,7 @@ class Graph:
             self.connections.remove(connection)
         
 
-    def get_adjacent(self, vertice:str) -> list:
+    def get_adjacencies(self, vertice:str) -> list:
         adjacent:list = []
         for connection in self.connections:
             if connection['parent'] == vertice:
@@ -76,12 +84,6 @@ class Graph:
             return self.in_degree(vertice) + self.out_degree(vertice)
         else:
             return self.in_degree(vertice)
-    
-    def is_adjacent(self, vertice1:str, vertice2:str) -> bool:
-        for connection in self.connections:
-            if connection['parent'] == vertice1 and connection['child'] == vertice2:
-                return True
-        return False
     
     def dijkstra(self, start:str, end:str) -> int:
         pass
