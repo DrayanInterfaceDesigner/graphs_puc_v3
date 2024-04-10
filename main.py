@@ -12,7 +12,7 @@ print(extraction)
 # print(interpreter.interpret_configurations(extraction['configs']))
 
 
-graph = Graph(True, True, 'MATRIZ')
+graph = Graph(False, True, 'MATRIZ')
 
 graph.add_vertice('A')
 graph.add_vertice('A')
