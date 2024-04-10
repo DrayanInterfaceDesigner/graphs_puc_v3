@@ -8,7 +8,6 @@ class Graph:
         self.directed:bool = directed
         self.weighted:bool = weighted
         self.representation:str = representation
-    
 
     def find_vertice(self, name:str) -> dict:
         for vertice in self.vertices:
@@ -268,6 +267,24 @@ class Graph:
         return vertices_str
 
 
+    def generate_matrix(self) -> list:
+        matrix:list = []
+
+        for vertice in self.vertices:
+
+            slots:list = [0] * len(self.vertices)
+            va:str = list(vertice.values())[0]
+            
+            for vb in self.vertices:
+                _b:str = list(vb.values())[0]
+                adjacencies:list = self.get_adjacencies(_b)
+                if va in adjacencies:
+                    slots[self.vertices.index(vb)] = 1
+                    
+            matrix.append(slots)
+        
+        return matrix
+
     def to_string_matrix(self) -> str:
         connections_str:str = "Edges: \n"
         final_string:str = ""
@@ -336,7 +353,6 @@ class Graph:
         final_string+=edges
 
         return final_string
-
 
 
 

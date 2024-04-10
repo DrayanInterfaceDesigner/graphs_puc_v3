@@ -83,3 +83,6 @@ print(f'MST = {g_mst}\n custo = {custo}')
 print(graph)
 
 parser.save(graph)
+
+
+print(graph.generate_matrix())
