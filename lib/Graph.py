@@ -1,5 +1,5 @@
 import time
-# import numpy as np
+import matplotlib.pyplot as plt
 
 class Graph:
     def __init__(self, directed:bool, weighted:bool, representation:str) -> None:
