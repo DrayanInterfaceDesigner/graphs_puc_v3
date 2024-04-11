@@ -356,14 +356,19 @@ class Graph:
 
             slots:list = ['0'] * len(self.vertices)
             va:str = list(vertice.values())[0]
-            
+            text:str = f"{va} ({list(vertice.keys())[0]})"
+            weight:str = ""
+
             for vb in self.vertices:
                 _b:str = list(vb.values())[0]
                 adjacencies:list = self.get_adjacencies(_b)
                 if va in adjacencies:
                     slots[self.vertices.index(vb)] = '1'
+
+                if self.weighted and va in adjacencies:
+                    weight= f" | w({self.get_weight(va, _b)})"
                     
-            text:str = f"{va} ({list(vertice.keys())[0]}): {' '.join(slots)}"
+            text += f": {' '.join(slots)}" + weight
             binary_adjacencies.append(text)
         
         final_string += "\n" + self.generate_nodes_string() + "\n"
@@ -381,7 +386,10 @@ class Graph:
         for adjacency in adjacencies:
             parent:str = list(adjacency[0].values())[0]
             parent_index:str = list(adjacency[0].keys())[0]
-            connections_str+= f"{parent} ({parent_index}): {', '.join(adjacency[1])}\n"
+            connections_str+= f"{parent} ({parent_index})"
+            if self.weighted and len(adjacency[1]) > 1: 
+                connections_str+= f" w({self.get_weight(adjacency[1][0], adjacency[1][1])})"
+            connections_str+= f": {', '.join(adjacency[1])}\n"
                 
         final_string += "\n" + self.generate_nodes_string() + "\n"
         final_string += "\n" + connections_str
