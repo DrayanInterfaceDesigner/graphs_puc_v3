@@ -366,7 +366,10 @@ class Graph:
                     slots[self.vertices.index(vb)] = '1'
 
                 if self.weighted and va in adjacencies:
-                    weight= f" | w({self.get_weight(va, _b)})"
+                    w: str = self.get_weight(va, _b)
+                    w = '1' if w is None else w
+                    
+                    weight= f" | w({w})"
                     
             text += f": {' '.join(slots)}" + weight
             binary_adjacencies.append(text)
@@ -388,12 +391,12 @@ class Graph:
             parent_index:str = list(adjacency[0].keys())[0]
             connections_str+= f"{parent} ({parent_index})"
             if self.weighted: 
-                w = '-'
+                w = '1'
                 if len(adjacency[1]) > 1:
                     w:str = self.get_weight(adjacency[1][0], adjacency[1][1])
-                    w = '-' if w is None else w
+                    w = '1' if w is None else w
                 connections_str+= f" w({w})"
-                
+
             connections_str+= f": {', '.join(adjacency[1])}\n"
                 
         final_string += "\n" + self.generate_nodes_string() + "\n"
