@@ -10,7 +10,10 @@ class Graph:
         self.weighted:bool = weighted
         self.representation:str = representation
 
-        self.matrix:list = []
+        if self.representation == 'MATRIZ':
+            self.matrix:list = []
+            self.name_matrix:list = []
+        else: self.list:list = []
             
 
     def find_vertice(self, name:str) -> dict:
