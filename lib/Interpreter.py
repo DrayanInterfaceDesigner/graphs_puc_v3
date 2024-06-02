@@ -47,11 +47,15 @@ class Interpreter:
     def build(self, parsed:dict) -> Graph:
         config:dict = self.interpret_configurations(parsed['configs'])
         print('config', config)
+
+
         graph:Graph = Graph(
             config.get('directed'),
             config.get('weighted'),
             config.get('representation')
         )
+
+        
         self.interpret_vertices(graph, parsed['vertices'])
         self.interpret_edges(graph, parsed)
         return graph
