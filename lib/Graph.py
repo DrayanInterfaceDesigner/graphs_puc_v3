@@ -2,441 +2,343 @@ import time
 import matplotlib.pyplot as plt
 from copy import deepcopy
 
+''' TEMPLATE:
+
+        if self.representation == "LIST":
+            pass
+        elif self.representation == "MATRIX":
+            pass
+
+'''
+
 class Graph:
-    def __init__(self, directed:bool, weighted:bool, representation:str) -> None:
-        self.vertices:list = []
-        self.connections:list = []
+    def __init__(self, directed: bool, weighted: bool, representation: str):
         self.directed:bool = directed
         self.weighted:bool = weighted
         self.representation:str = representation
 
-        self.matrix:list = []
-            
+        if self.representation == 'LIST':
+            self.aList = {}
+            # {'A': {'C': 1, 'B': 1}, 'B': {'A': 1}, 'C': {'A': 1}}
+        elif self.representation == 'MATRIX':
+            self.aMatrix = []
+            # [[None, 1, 1], [1, None, None], [1, None, None]]
+            self.nameDict = {}
+            # {'A': 0, 'B': 1, 'C': 2}
+        
 
-    def find_vertice(self, name:str) -> dict:
-        for vertice in self.vertices:
-            if list(vertice.values())[0] == name:
-                return vertice
-        return None
-    
-    def find_edge(self, vertice_a:str, vertice_b:str) -> bool:
-        for connection in self.connections:
-            if (connection['parent'] == vertice_a and connection['child'] == vertice_b):
+    def find_vertice(self, name:str) -> bool:
+        if self.representation == "LIST":
+            if name in self.aList:
+                return True   
+        elif self.representation == "MATRIX":
+            if name in self.nameDict:
                 return True
         return False
-                
+
+    def find_edge(self, parent:str, child:str) -> bool:
+        if not self.find_vertice(parent) or not self.find_vertice(child):
+            return False
+        elif self.representation == "LIST":
+            if child in self.aList[parent].keys():
+                return True
+        elif self.representation == "MATRIX":
+            if self.aMatrix[self.nameDict[parent]][self.nameDict[child]]:
+                return True
+        return False
+
     def add_vertice(self, name:str) -> None:
         if not self.find_vertice(name):
-            self.vertices.append({len(self.vertices): name})
-    
-    def add_edge(self, parent:str, child:str, weight:int|float=1) -> None:
-        w:int|float = 1 if not self.weighted else weight
-        self.connections.append({'parent': parent, 'child': child, 'weight': w})
-        if not self.directed:
-            self.connections.append({'parent': child, 'child': parent, 'weight': w})
-    
-    def remove_vertice(self, name:str ) -> None:
-        to_remove:list = []
-        for connection in self.connections:
-            if connection['parent'] == name or connection['child'] == name:
-                to_remove.append(connection)
-        
-        for connection in to_remove:
-            self.connections.remove(connection)
-        
-        self.vertices = [vertice for vertice in self.vertices if list(vertice.values())[0] != name]
-    
-    def remove_edge(self, vertice_a:str, vertice_b:str) -> None:
-        to_remove:list = []
+            if self.representation == "LIST":
+                self.aList.update({name : {}})
+            elif self.representation == "MATRIX":
+                self.nameDict.update({name : len(self.nameDict)})
+                arr = []
+                for i in range(len(self.nameDict)):
+                    arr.append(None)
+                for array in self.aMatrix:
+                    array.append(None)
+                self.aMatrix.append(arr)
 
-        for connection in self.connections:
-            if connection['parent'] == vertice_a and connection['child'] == vertice_b:
-                to_remove.append(connection)
-            elif connection['parent'] == vertice_b and connection['child'] == vertice_a:
-                to_remove.append(connection)
-            
-        for connection in to_remove:
-            self.connections.remove(connection)
-        
+    def add_edge(self, parent:str, child:str, weight:int|float=1) -> None:
+        if self.find_vertice(parent) and self.find_vertice(child):
+            if self.representation == "LIST":
+                if child not in self.aList[parent].keys():
+                    self.aList[parent].update({child : weight})
+                    if not self.directed:
+                        self.aList[child].update({parent : weight})
+            elif self.representation == "MATRIX":
+                if not self.aMatrix[self.nameDict[parent]][self.nameDict[child]]:
+                    self.aMatrix[self.nameDict[parent]][self.nameDict[child]] = weight
+                    if not self.directed:
+                        self.aMatrix[self.nameDict[child]][self.nameDict[parent]] = weight
+
+    def remove_vertice(self, name:str) -> None:
+        if self.find_vertice(name):
+            if self.representation == "LIST":
+                del self.aList[name]
+                for key in self.aList:
+                    if name in self.aList[key]:
+                        del self.aList[key][name]
+            elif self.representation == "MATRIX":
+                del self.aMatrix[self.nameDict[name]]
+                for i in self.aMatrix:
+                    for j in range(len(i)):
+                        if j == self.nameDict[name]:
+                            del i[j]
+                for i in self.nameDict:
+                    if self.nameDict[i] > self.nameDict[name]:
+                        self.nameDict[i] -= 1
+                del self.nameDict[name]
+
+    def remove_edge(self, parent:str, child:str):
+        if self.find_vertice(parent) and self.find_vertice(child):
+            if self.representation == "LIST":
+                if child in self.aList[parent].keys():
+                    del self.aList[parent][child]
+                    if not self.directed:
+                        del self.vertex_list[child][parent]
+            elif self.representation == "MATRIX":
+                if self.aMatrix[self.nameDict[parent]][self.nameDict[child]]:
+                    self.aMatrix[self.nameDict[parent]][self.nameDict[child]] = None
+                    if not self.directed:
+                        self.aMatrix[self.nameDict[child]][self.nameDict[parent]] = None
+
 
     def get_adjacencies(self, vertice:str) -> list:
-        adjacent:list = []
-        for connection in self.connections:
-            if connection['parent'] == vertice:
-                adjacent.append(connection['child'])
-            elif connection['child'] == vertice:
-                adjacent.append(connection['parent'])
-        
-        adjacent = list(set(adjacent))
-        return adjacent
-    
+        if self.find_vertice(vertice):
+            adjacencies = {}
+            if self.representation == "LIST":
+                for i in self.aList[vertice]:
+                    adjacencies[i] = self.aList[vertice][i]
+                return adjacencies
+            elif self.representation == "MATRIX":
+                for i in range(len(self.aMatrix[self.nameDict[vertice]])):
+                    if self.aMatrix[self.nameDict[vertice]][i]:
+                        for key, value in self.nameDict.items():
+                            if value == i:
+                                adjacencies[key] = self.nameDict[key]
+                return adjacencies
 
-    def get_weight(self, vertice_a:str, vertice_b:str) -> (int|float|None):
-        if not self.weighted:
-            return 1
-        elif not self.find_edge(vertice_a, vertice_b):
-            return None
-        else:
-            for connection in self.connections:
-                if connection['parent'] == vertice_a and connection['child'] == vertice_b:
-                    return connection['weight']
-                
-    def set_weight(self, vertice_a:str, vertice_b:str, weight:int|float) -> None:
-        if self.weighted:
-            if not self.find_edge(vertice_a, vertice_b):
-                self.add_edge(vertice_a, vertice_b, weight)
+
+    def get_weight(self, parent:str, child:str) -> (int|float|None):
+        if self.find_edge(parent, child):
+            if not self.weighted:
+                return 1
+            elif self.representation == "LIST":
+                return self.aList[parent][child]
+            elif self.representation == "MATRIX":
+                print(self.nameDict[parent])
+                return self.aMatrix[self.nameDict[parent]][self.nameDict[child]]
+
+    def set_weight(self, parent:str, child:str, weight:int|float) -> None:
+        if not self.find_edge(parent, child):
+            self.add_edge(parent, child, weight)
+        elif self.representation == "LIST":
+            self.aList[parent].update({child : weight})
+            if not self.directed:
+                self.aList[child].update({parent : weight})
+        elif self.representation == "MATRIX":
+            self.aMatrix[self.nameDict[parent]][self.nameDict[child]] = weight
+            if not self.directed:
+                self.aMatrix[self.nameDict[child]][self.nameDict[parent]] = weight
+
+
+    def out_degree(self, name:str) -> int:
+        if self.find_vertice(name):
+            if self.representation == "LIST":
+                return len(self.aList[name])
+            elif self.representation == "MATRIX":
+                degree:int = 0
+                for i in self.aMatrix[self.nameDict[name]]:
+                    if i: 
+                        degree += 1
+                return degree        
+
+    def in_degree(self, name:str) -> int:
+        if self.find_vertice(name):
+            degree:int = 0
+            if self.representation == "LIST":
+                for vertice in self.aList:
+                    if vertice != name:
+                        for i in self.aList[vertice]:
+                            if i == name:
+                                degree += 1
+                return degree
+            elif self.representation == "MATRIX":
+                for i in self.aMatrix:
+                    for j in range(len(i)):
+                        if j == self.nameDict[name] and i[j]:
+                            degree += 1
+                return degree
+
+    def degree(self, name:str) -> int:
+        if self.find_vertice(name):
+            if self.directed:
+                return self.in_degree(name) + self.out_degree(name)
             else:
-                for connection in self.connections:
-                    if connection['parent'] == vertice_a and connection['child'] == vertice_b:
-                        connection['weight'] = weight
-        else:
-            if not self.find_edge(vertice_a, vertice_b):
-                self.add_edge(vertice_a, vertice_b)
-
-
-    def out_degree(self, vertice:str) -> int:
-        degree:int = 0
-        for connection in self.connections:
-            if connection['parent'] == vertice:
-                degree += 1
-        return degree
-
-    def in_degree(self, vertice:str) -> int:
-        degree:int = 0
-        for connection in self.connections:
-            if connection['child'] == vertice:
-                degree += 1
-        return degree
+                return self.out_degree(name)
+            
     
-    def degree(self, vertice:str) -> int:
-        if self.directed:
-            return self.in_degree(vertice) + self.out_degree(vertice)
-        else:
-            return self.in_degree(vertice)
-
-
     def depth_search(self, start:str, end:str) -> int:
-        if not self.find_vertice(start) or not self.find_vertice(end):
-            return 0
-        
-        start_time = time.perf_counter()
-
-        stack = []
-        visited = []
-        stack.append(start)
-
-        while len(stack) > 0:
-            vertice = stack.pop(-1)
-            if vertice not in visited:
-                visited.append(vertice)
-            for adjacency in sorted(self.get_adjacencies(vertice)):
-                if adjacency not in visited:
-                    stack.append(adjacency)
-            if vertice == end:
-                break
-
-        end_time = time.perf_counter()
-        total_time = end_time - start_time
-
-        return visited, total_time
+        pass
 
     def width_search(self, start:str, end:str) -> int:
-        if not self.find_vertice(start) or not self.find_vertice(end):
-            return 0
-        
-        start_time = time.perf_counter()
+        pass
 
-        queue = []
-        visited = []
-        queue.append(start)
-
-        while len(queue) > 0:
-            vertice = queue.pop(0)
-            if vertice not in visited:
-                visited.append(vertice)
-            for adjacency in sorted(self.get_adjacencies(vertice)):
-                if adjacency not in visited:
-                    queue.append(adjacency)
-            if vertice == end:
-                break
-
-        end_time = time.perf_counter()
-        total_time = end_time - start_time
-
-        return visited, total_time
-    
-    # dijkstra helper, determines min cost vertice
     def extract_min(self, q, costs):
-        min_cost_vertice = None
-        min_weight = +1e10
-        for vertice in q:
-            if costs[vertice] <= min_weight:
-                min_weight = costs[vertice]
-                min_cost_vertice = vertice
-        return min_cost_vertice
+        pass
 
-    def dijkstra(self, start:str, end:str) -> int:
-        if not self.find_vertice(start) or not self.find_vertice(end):
-            return 0
-        
-        start_time = time.perf_counter()
-
-        pi = {}
-        costs = {}
-        q = []
-        path = []
-        total_cost = 1e10
-        named_vertices = [list(x.values())[0] for x in self.vertices]
-
-        for vertice in named_vertices:
-            costs[vertice] = +1e10 # infinite
-            pi[vertice] = None
-        costs[start] = 0.0
-        for vertice in named_vertices:
-            q.append(vertice)
-        while len(q) > 0:
-            vertice = self.extract_min(q, costs)
-            if vertice is None:
-                break
-            q.remove(vertice)
-            for adjacency in self.get_adjacencies(vertice):
-                new_cost = costs[vertice] + self.get_weight(vertice, adjacency)
-                if new_cost < costs[adjacency]:
-                    costs[adjacency] = new_cost
-                    pi[adjacency] = vertice
-        if pi[end] != None:
-            total_cost = costs[end]
-            vertice = end
-            while vertice != None:
-                path.insert(0, vertice)
-                vertice = pi[vertice]
-
-        end_time = time.perf_counter()
-        total_time = end_time - start_time
-
-        return path, total_cost, total_time
+    def djikstra(self, start:str, end:str) -> int:
+        pass
 
 
     def is_connected(self):
-        warshall = self.warshall()
-        matrix = warshall.matrix
-        for i in range(len(matrix)):
-            for j in range(len(matrix)):
-                if matrix[i][j] == 0:
-                    return False  
-        return True
+        pass
 
     def prim(self):
-        if self.is_connected():
-            predecessors = {}
-            weights = {}
-            named_vertices = [list(x.values())[0] for x in self.vertices]
-
-            for vertice in named_vertices:
-                predecessors[vertice] = None
-                weights[vertice] = 1e10
-            q = [x for x in named_vertices]
-            while len(q) > 0:
-                u = self.extract_min(q, weights)
-                q.remove(u)
-
-                for adjacency in self.get_adjacencies(u):
-                    weight = self.get_weight(u, adjacency)
-                    if adjacency in q and weight < weights[adjacency]:
-                        predecessors[adjacency] = u
-                        weights[adjacency] = weight
-
-            Prim_Graph = Graph(False, True, self.representation)
-
-            for vertice in named_vertices:
-                Prim_Graph.add_vertice(vertice)
-
-            cost = 0
-            for start_vertice in predecessors.keys():
-                end_vertice = predecessors[start_vertice]
-                if end_vertice is not None:
-                    Prim_Graph.add_edge(start_vertice, end_vertice, weights[start_vertice])
-                    cost += weights[start_vertice]
-
-            return Prim_Graph, cost
-        else: 
-            return "Graph is not connected"
+        pass
 
     def eulerian(self):
-        vertices_list: list = [list(x.values())[0] for x in self.vertices]
-
-        if self.directed:
-            for vertice in vertices_list:
-                if self.in_degree(vertice) != self.out_degree(vertice):
-                    return False
-            if self.is_connected():
-                return True
-        else:
-            if self.is_connected():
-                for vertice in vertices_list:
-                    if self.degree(vertice) % 2 != 0:
-                        return False
-                return True
-            return False
+        pass
 
     def warshall(self):
-        matrix: list = self.generate_matrix()
-
-        for k in range(len(matrix)):
-            for i in range(len(matrix)):
-                for j in range(len(matrix)):
-                    matrix[i][j] = matrix[i][j] or (matrix[i][k] and matrix[k][j])
-        
-        new_graph: Graph = deepcopy(self)
-        new_graph.matrix = matrix
-        new_graph.from_matrix_update()
-
-        return new_graph
-
-
-    def generate_nodes_string(self) -> str:
-        vertices:list = []
-        vertices_str:str = "Nodes: \n"
-
-        for vertice in self.vertices:
-            vertices.append(f"{list(vertice.values())[0]} ({list(vertice.keys())[0]})")
-        
-        vertices_str += ', '.join(vertices)
-        return vertices_str
-
-
-    def generate_matrix(self) -> list:
-        matrix:list = []
-
-        for vertice in self.vertices:
-
-            slots:list = [0] * len(self.vertices)
-            va:str = list(vertice.values())[0]
-            
-            for vb in self.vertices:
-                _b:str = list(vb.values())[0]
-                # adjacencies:list = self.find_edge(_b)
-                # if va in adjacencies:
-                #     slots[self.vertices.index(vb)] = 1
-                if self.find_edge(va, _b):
-                    slots[self.vertices.index(vb)] = 1
-
-            matrix.append(slots)
-        
-        return matrix
-    
-    def from_matrix_update(self) -> None:
-        self.connections: list = []
-        for i in range(len(self.matrix)):
-            for j in range(len(self.matrix)):
-                if self.matrix[i][j] == 1:
-                    self.add_edge(list(self.vertices[i].values())[0], list(self.vertices[j].values())[0])
+        pass
 
     def degree_distribution_histogram(self):
-        vertices_list: list = [list(x.values())[0] for x in self.vertices]
-        degrees: list = [self.degree(x) for x in vertices_list]
-
-        plt.hist(degrees, bins=range(min(degrees), max(degrees) + 1), alpha=0.7, color='purple', edgecolor='cyan')
-        plt.title('Degree Distribution')
-        plt.xlabel('Degree')
-        plt.ylabel('Frequency')
-        plt.savefig("degree_distribution.png")
-        plt.show()
-
-        print(degrees)
-
-    def to_string_matrix(self) -> str:
-        connections_str:str = "Edges: \n"
-        final_string:str = ""
-        binary_adjacencies:list = []
-
-        list(self.vertices[0].values())[0]
-
-        for vertice in self.vertices:
-
-            slots:list = ['0'] * len(self.vertices)
-            va:str = list(vertice.values())[0]
-            text:str = f"{va} ({list(vertice.keys())[0]})"
-            weight:str = ""
-
-            for vb in self.vertices:
-                _b:str = list(vb.values())[0]
-                adjacencies:list = self.get_adjacencies(_b)
-                if va in adjacencies:
-                    slots[self.vertices.index(vb)] = '1'
-
-                if self.weighted and va in adjacencies:
-                    w: str = self.get_weight(va, _b)
-                    w = '1' if w is None else w
-                    
-                    weight= f" | w({w})"
-                    
-            text += f": {' '.join(slots)}" + weight
-            binary_adjacencies.append(text)
-        
-        final_string += "\n" + self.generate_nodes_string() + "\n"
-        final_string += "\n" + connections_str
-        final_string += '\n'.join(binary_adjacencies)
-
-        return final_string
-
-    def to_string_list(self) -> str:
-
-        connections_str:str = "Edges: \n"
-        final_string:str = ""
-        adjacencies:list = [(v, self.get_adjacencies(list(v.values())[0])) for v in self.vertices]
-
-        for adjacency in adjacencies:
-            parent:str = list(adjacency[0].values())[0]
-            parent_index:str = list(adjacency[0].keys())[0]
-            connections_str+= f"{parent} ({parent_index})"
-            if self.weighted: 
-                w = '1'
-                if len(adjacency[1]) > 1:
-                    w:str = self.get_weight(adjacency[1][0], adjacency[1][1])
-                    w = '1' if w is None else w
-                connections_str+= f" w({w})"
-
-            connections_str+= f": {', '.join(adjacency[1])}\n"
-                
-        final_string += "\n" + self.generate_nodes_string() + "\n"
-        final_string += "\n" + connections_str
-
-        return final_string
+        pass
     
 
-    def to_pajek(self):
+    def __str__(self): # REWRITE THIS!!!!!!!!!!!
 
-        final_string:str = ""
+        idx_vertex = 0
+        string_1 = ""
+        string_2 = ""
+        string_representation = "Nós: "
+        #verificar se é matriz ou lista antes de printar
+        if self.representation == "LIST":
 
-        configuration:str = ""
-        configuration+= f"% directed={self.directed}\n"
-        configuration+= f"% weighted={self.weighted}\n"
-        repr_key:str = "adjacency_matrix" if self.representation == "MATRIZ" else "edge_list"
-        configuration+= f"% representation={repr_key}\n"
+            for i in self.aList.keys():
 
-        vertices:str = ""
-        vertices+= f"*Vertices\n"
-        vertices+= '\n'.join([' '.join([str(list(v.keys())[0]), list(v.values())[0]]) for v in self.vertices])
+                string_1 += f"{i}({idx_vertex}), "
+                string_2 += f"{i}({idx_vertex}): "
 
-        edges:str = ""
-        edges+= f"*arcs\n"
-        edges+= '\n'.join([' '.join([str(v['parent']), str(v['child']), str(v['weight']) if self.weighted else ''])  for v in self.connections])
+                for j in self.aList[i].keys():
 
-        final_string+= configuration
-        final_string+= vertices
-        final_string+="\n\n"
-        final_string+=edges
+                    string_2 += f"{j}, "
 
-        return final_string
+                idx_vertex+=1
+
+                string_2 = string_2[0:-2]+"\n"
+
+            string_representation += string_1[0:-2]
+            string_representation += "\nArestas(listas de adjacências):\n"
+            string_representation += string_2
+            
+            #return f"Grafo {self.representation} {self.aList}" ####
+            
+            return string_representation
+        
+        elif self.representation == "MATRIX":
+
+            for i in self.nameDict.keys():
+
+                string_1 += f"{i}({self.nameDict[i]}), "
+                string_2 += f"{i}({self.nameDict[i]}): "
+
+                for j in self.aMatrix[self.nameDict[i]]:
+                    
+                    if j == None:
+
+                        j = 0
+
+                    string_2 += f"{j} "
+                
+                idx_vertex+=1
+                string_2 += "\n"
+            
+            string_representation += string_1[0:-2]
+            string_representation += "\nArestas(matriz):\n"
+            string_representation += string_2
+
+            return string_representation
+                
+            #return f"{self.aMatrix}\n Vértices e index {self.nameDict}"
+
+############################# TESTS ###############################
 
 
 
-    def __str__(self) -> str:
-        if self.representation == 'MATRIZ':
-            return self.to_string_matrix()
-        return self.to_string_list()
+gL = Graph(False, False, "LIST")
+gM = Graph(False, False, "MATRIX")
 
-    def __repr__(self) -> str:
-        return f"Graph: v: {self.vertices} c: {self.connections}"
+# print(gL.find_vertice("A"))
+gL.add_vertice("A")
+# print(gL.find_vertice("A"))
+gL.add_vertice("B")
+gL.add_vertice("C")
+gL.add_vertice("D")
+
+
+gM.add_vertice("A")
+gM.add_vertice("B")
+gM.add_vertice("C")
+gM.add_vertice("D")
+
+
+gL.add_edge("A", "C")
+gL.add_edge("B", "A")
+gL.add_edge("C", "A")
+gL.add_edge("C", "D")
+# print(gL.find_edge("A", "C"))
+# print(gL.find_edge("B", "C"))
+
+gM.add_edge("A", "C")
+gM.add_edge("B", "A")
+gL.add_edge("C", "A")
+gM.add_edge("C", "D")
+# print(gM.find_edge("A", "C"))
+# print(gM.find_edge("B", "C"))
+
+gL.remove_vertice("D")
+gM.remove_vertice("D")
+
+# gL.remove_edge("C", "A")
+
+print(f"GL Adjacencies: {gL.get_adjacencies('A')}")
+print(f"GM Adjacencies: {gM.get_adjacencies('A')}")
+
+# print(gL.get_weight("B", "C"))
+# print(gM.get_weight("B", "C"))
+
+print(gL)
+print(gM)
+
+print(gL.aList)
+print(gM.aMatrix)
+print(gM.nameDict)
+
+
+
+################# Weight Testing #################
+
+# gMW = Graph(False, True, "MATRIX")
+# gLW = Graph(False, True, "LIST")
+
+# gLW.add_vertice("A")
+# gLW.add_vertice("B")
+# gLW.add_vertice("C")
+# gLW.add_vertice("D")
+
+# gLW.add_edge("A", "C", 4)
+# gLW.add_edge("B", "A", 5)
+# gLW.add_edge("C", "A", 3)
+# gLW.add_edge("C", "D", 2)
+
+# print(gLW.get_weight("A", "C"))
+
+# gLW.set_weight("C", "A", 9)
+
+# print(gLW.get_weight("A", "C"))
+# print(gLW.get_weight("C", "A"))
 
