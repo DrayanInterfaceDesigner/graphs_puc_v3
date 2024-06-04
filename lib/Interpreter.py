@@ -38,9 +38,10 @@ class Interpreter:
         vertices:list = parsed['vertices']
 
         for connection in connections:
+            
             graph.add_edge(
-                vertices[connection['parent']], 
-                vertices[connection['child']], 
+                list(vertices[connection['parent']].values())[0], 
+                list(vertices[connection['child']].values())[0], 
                 self.infer_type(connection['weight'])
             )
 
@@ -48,11 +49,13 @@ class Interpreter:
         config:dict = self.interpret_configurations(parsed['configs'])
         print('config', config)
 
+        repr = config.get('representation')
+        repr = repr.upper()
 
         graph:Graph = Graph(
             config.get('directed'),
             config.get('weighted'),
-            config.get('representation')
+            repr
         )
 
         

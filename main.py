@@ -9,7 +9,7 @@ extraction:dict = parser.parse()
 def test_reading_pajek_file():
     print(f'\n =========== Test for reading pajek file =========== \n')
 
-    parser: Parser = Parser("data/matrix.net")
+    parser: Parser = Parser("data/graph.net")
     interpreter: Interpreter = Interpreter()
     extraction:dict = parser.parse()
 
@@ -19,16 +19,16 @@ def test_reading_pajek_file():
 def test_add_existing_vertice():
     print(f'\n =========== Test for adding existing vertice =========== \n')
 
-    graph = Graph(False, True, 'MATRIZ')
+    graph = Graph(False, True, 'MATRIX')
     graph.add_vertice('A')
     graph.add_vertice('A')
-    print(graph.vertices)
+    print(graph)
 
 def test_add_edge_n_weighted():
     print(f'\n =========== Test for adding edge non weighted =========== \n')
 
-    graph = Graph(False, True, 'MATRIZ')
-    graph_weighted = Graph(False, False, 'MATRIZ')
+    graph = Graph(False, True, 'MATRIX')
+    graph_weighted = Graph(False, False, 'MATRIX')
 
     graph.add_vertice('A')
     graph.add_vertice('B')
@@ -44,7 +44,7 @@ def test_add_edge_n_weighted():
 def test_remove_vertice():
     print(f'\n =========== Test for removing vertice =========== \n')
 
-    graph = Graph(False, True, 'MATRIZ')
+    graph = Graph(False, True, 'MATRIX')
     graph.add_vertice('A')
     graph.add_vertice('B')
     graph.add_vertice('C')
@@ -61,7 +61,7 @@ def test_remove_vertice():
 def test_remove_edge():
     print(f'\n =========== Test for removing edge =========== \n')
 
-    graph = Graph(False, True, 'MATRIZ')
+    graph = Graph(False, True, 'MATRIX')
     graph.add_vertice('A')
     graph.add_vertice('B')
     graph.add_vertice('C')
@@ -79,7 +79,7 @@ def test_remove_edge():
 def test_edge_exists():
     print(f'\n =========== Test for edge exists =========== \n')
 
-    graph = Graph(False, True, 'MATRIZ')
+    graph = Graph(False, True, 'MATRIX')
     graph.add_vertice('A')
     graph.add_vertice('B')
     graph.add_vertice('C')
@@ -92,7 +92,7 @@ def test_edge_exists():
 def test_degree_operations():
     print(f'\n =========== Test for degree operations =========== \n')
 
-    graph = Graph(False, True, 'MATRIZ')
+    graph = Graph(False, True, 'MATRIX')
     graph.add_vertice('A')
     graph.add_vertice('B')
     graph.add_vertice('C')
@@ -121,7 +121,7 @@ def test_degree_operations():
 def test_weight_update():
     print(f'\n =========== Test for weight update =========== \n')
 
-    graph = Graph(False, False, 'MATRIZ')
+    graph = Graph(False, False, 'MATRIX')
     graph.add_vertice('A')
     graph.add_vertice('B')
     graph.add_vertice('C')
@@ -135,8 +135,8 @@ def test_weight_update():
 def test_print():
     print(f'\n =========== Test for print =========== \n')
 
-    graph = Graph(True, False, 'MATRIZ')
-    graph_list = Graph(False, True, 'LISTA')
+    graph = Graph(True, False, 'MATRIX')
+    graph_list = Graph(False, True, 'LIST')
 
     graph.add_vertice('A')
     graph.add_vertice('B')
@@ -158,7 +158,7 @@ def test_print():
 def test_persistency():
     print(f'\n =========== Test for persistency =========== \n')
 
-    graph = Graph(False, True, 'MATRIZ')
+    graph = Graph(False, True, 'MATRIX')
     graph.add_vertice('A')
     graph.add_vertice('B')
     graph.add_vertice('C')
@@ -173,7 +173,7 @@ def test_persistency():
 def test_transitive_closure():
     print(f'\n =========== Test for transitive closure =========== \n')
 
-    graph = Graph(False, True, 'MATRIZ')
+    graph = Graph(False, True, 'MATRIX')
     graph.add_vertice('A')
     graph.add_vertice('B')
     graph.add_vertice('C')
@@ -181,14 +181,14 @@ def test_transitive_closure():
     graph.add_edge('A', 'C')
     graph.add_edge('B', 'C')
 
-    print(graph.generate_matrix())
+    print(graph)
     warshall = graph.warshall()
     print('WARSHALL', warshall)
 
 def test_search_algorithms():
     print(f'\n =========== Test for search algorithms =========== \n')
 
-    graph = Graph(False, True, 'MATRIZ')
+    graph = Graph(False, True, 'MATRIX')
 
     graph.add_vertice('A')
     graph.add_vertice('A')
@@ -219,20 +219,20 @@ def test_search_algorithms():
 def test_eulerian():
     print(f'\n =========== Test for eulerian =========== \n')
 
-    graph = Graph(True, True, 'MATRIZ')
+    graph = Graph(True, True, 'MATRIX')
 
     graph.add_vertice('A')
     graph.add_vertice('A')
     graph.add_vertice('B')
     graph.add_vertice('C')
     graph.add_vertice('D')
-    graph.add_vertice('E')
+    # graph.add_vertice('E')
     graph.add_edge('A', 'B', 2)
-    graph.add_edge('A', 'C', 4)
+    # graph.add_edge('A', 'C', 4)
     graph.add_edge('B', 'C', 6)
-    graph.add_edge('D', 'C', 1)
-    graph.add_edge('D', 'E', 2)
-    graph.add_edge('C', 'E', 3)
+    graph.add_edge('C', 'D', 1)
+    graph.add_edge('D', 'A', 2)
+    # graph.add_edge('C', 'E', 3)
 
     print(graph)
     print("\nIs eulerian: ", graph.eulerian())
@@ -240,7 +240,7 @@ def test_eulerian():
 def test_prim():
     print(f'\n =========== Test for prim =========== \n')
 
-    graph = Graph(False, True, 'LISTA')
+    graph = Graph(False, True, 'LIST')
 
     graph.add_vertice('A')
     graph.add_vertice('A')
@@ -261,7 +261,7 @@ def test_prim():
 def test_degree_distribution_histogram():
     print(f'\n =========== Test for degree distribution histogram =========== \n')
 
-    graph = Graph(True, True, 'MATRIZ')
+    graph = Graph(True, True, 'MATRIX')
 
     graph.add_vertice('A')
     graph.add_vertice('B')

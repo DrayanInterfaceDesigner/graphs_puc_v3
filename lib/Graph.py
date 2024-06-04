@@ -128,7 +128,6 @@ class Graph:
             elif self.representation == "LIST":
                 return self.aList[parent][child]
             elif self.representation == "MATRIX":
-                print(self.nameDict[parent])
                 return self.aMatrix[self.nameDict[parent]][self.nameDict[child]]
 
     def set_weight(self, parent:str, child:str, weight:int|float) -> None:
@@ -181,142 +180,366 @@ class Graph:
             
     
     def depth_search(self, start:str, end:str) -> int:
-        pass
+        if not self.find_vertice(start) or not self.find_vertice(end):
+            return 0
+        
+        start_time = time.perf_counter()
+
+        stack = []
+        visited = []
+        stack.append(start)
+
+        while len(stack) > 0:
+            vertice = stack.pop(-1)
+            if vertice not in visited:
+                visited.append(vertice)
+            for adjacency in sorted(self.get_adjacencies(vertice)):
+                if adjacency not in visited:
+                    stack.append(adjacency)
+            if vertice == end:
+                break
+
+        end_time = time.perf_counter()
+        total_time = end_time - start_time
+
+        return visited, total_time
 
     def width_search(self, start:str, end:str) -> int:
-        pass
+        if not self.find_vertice(start) or not self.find_vertice(end):
+            return 0
+        
+        start_time = time.perf_counter()
 
+        queue = []
+        visited = []
+        queue.append(start)
+
+        while len(queue) > 0:
+            vertice = queue.pop(0)
+            if vertice not in visited:
+                visited.append(vertice)
+            for adjacency in sorted(self.get_adjacencies(vertice)):
+                if adjacency not in visited:
+                    queue.append(adjacency)
+            if vertice == end:
+                break
+
+        end_time = time.perf_counter()
+        total_time = end_time - start_time
+
+        return visited, total_time
+    
+    # dijkstra helper, determines min cost vertice
     def extract_min(self, q, costs):
-        pass
+        min_cost_vertice = None
+        min_weight = +1e10
+        for vertice in q:
+            if costs[vertice] <= min_weight:
+                min_weight = costs[vertice]
+                min_cost_vertice = vertice
+        return min_cost_vertice
 
-    def djikstra(self, start:str, end:str) -> int:
-        pass
+    def dijkstra(self, start:str, end:str) -> int:
+        if not self.find_vertice(start) or not self.find_vertice(end):
+            return 0
+        
+        start_time = time.perf_counter()
+
+        pi = {}
+        costs = {}
+        q = []
+        path = []
+        total_cost = 1e10
+        
+        if self.representation == "LIST":
+            named_vertices = self.aList
+        elif self.representation == "MATRIX":
+            named_vertices = self.nameDict
+
+        for vertice in named_vertices:
+            costs[vertice] = +1e10 # infinite
+            pi[vertice] = None
+        costs[start] = 0.0
+        for vertice in named_vertices:
+            q.append(vertice)
+        while len(q) > 0:
+            currentVertice = self.extract_min(q, costs)
+            if currentVertice is None:
+                break
+            q.remove(currentVertice)
+            for adjacency in self.get_adjacencies(currentVertice):
+                new_cost = costs[currentVertice] + self.get_weight(currentVertice, adjacency)
+                if new_cost < costs[adjacency]:
+                    costs[adjacency] = new_cost
+                    pi[adjacency] = currentVertice
+        if pi[end] != None:
+            total_cost = costs[end]
+            currentVertice = end
+            while currentVertice != None:
+                path.insert(0, currentVertice)
+                currentVertice = pi[currentVertice]
+
+        end_time = time.perf_counter()
+        total_time = end_time - start_time
+
+        return path, total_cost, total_time
 
 
     def is_connected(self):
-        pass
+        warshall = self.warshall()
+        matrix = warshall.aMatrix
+        for i in range(len(matrix)):
+            for j in range(len(matrix)):
+                if matrix[i][j] == None:
+                    return False  
+        return True
 
     def prim(self):
-        pass
+        if not self.directed and self.weighted:
+            if self.is_connected():
+                predecessors = {}
+                weights = {}
+                q = []
+        
+                if self.representation == "LIST":
+                    vertices = self.aList.keys()
+                elif self.representation == "MATRIX":
+                    vertices = self.nameDict.keys()
+
+                for i in vertices:
+                    q.append(i)
+                    predecessors[i] = None
+                    weights[i] = 1e10
+                while len(q) > 0:
+                    u = self.extract_min(q, weights)
+                    q.remove(u)
+                    for adjacency in self.get_adjacencies(u):
+                        weight = self.get_weight(u, adjacency)
+                        if adjacency in q and weight < weights[adjacency]:
+                            predecessors[adjacency] = u
+                            weights[adjacency] = weight
+                primGraph = Graph(False, True, self.representation)
+                for vertice in vertices:
+                    primGraph.add_vertice(vertice)
+                cost = 0
+                for start_vertice in predecessors.keys():
+                    end_vertice = predecessors[start_vertice]
+                    if end_vertice is not None:
+                        primGraph.add_edge(start_vertice, end_vertice, weights[start_vertice])
+                        cost += weights[start_vertice]
+
+                return primGraph, cost
 
     def eulerian(self):
-        pass
+        if self.representation == "MATRIX":
+            vertices_list = self.nameDict.keys()
+        elif self.representation == "LIST":
+            vertices_list = self.aList.keys()
+        if self.directed:
+            for vertice in vertices_list:
+                if self.in_degree(vertice) != self.out_degree(vertice):
+                    return False
+            if self.is_connected():
+                return True
+        else:
+            if self.is_connected():
+                for vertice in vertices_list:
+                    if self.degree(vertice) % 2 != 0:
+                        return False
+                return True
+            return False
 
     def warshall(self):
-        pass
+        if self.representation == "MATRIX":
+            wMatrixGraph = self
+            wMatrix = self.aMatrix.copy()
+        elif self.representation == "LIST":
+            # Creates a new matrix graph so that warshall can run
+            wMatrixGraph = Graph(self.directed, self.weighted, "MATRIX")
+            for i in self.aList.keys():
+                wMatrixGraph.add_vertice(i)
+            for i in self.aList.keys():
+                for adjacency in self.aList[i].keys():
+                    wMatrixGraph.add_edge(i, adjacency, self.aList[i][adjacency])
+            wMatrix = wMatrixGraph.aMatrix.copy()
+        # actual warshall
+        for k in range(len(wMatrix)):
+            for i in range(len(wMatrix)):
+                for j in range(len(wMatrix)):
+                    wMatrix[i][j] = wMatrix[i][j] or (wMatrix[i][k] and wMatrix[k][j])
+        newGraph = Graph(wMatrixGraph.directed, wMatrixGraph.weighted, "MATRIX")
+        for i in wMatrixGraph.nameDict.keys():
+            newGraph.add_vertice(i)
+        names = {}
+        for vertice, index in wMatrixGraph.nameDict.items():
+            names[str(index)] = vertice
+        for i in range(len(wMatrixGraph.aMatrix)):
+            for j in range(len(wMatrixGraph.aMatrix)):
+                if wMatrix[i][j] != None:
+                    newGraph.add_edge(names[str(i)], names[str(j)], wMatrix[i][j])
+        return newGraph
 
     def degree_distribution_histogram(self):
-        pass
+        degrees = []
+        if self.representation == "LIST":
+            vertices = list(self.aList.keys())
+        elif self.representation == "MATRIX":
+            vertices = list(self.nameDict.keys())
+        for vertice in vertices:
+            degrees.append(self.degree(vertice))
+
+        plt.hist(degrees, bins=range(min(degrees), max(degrees) + 1), alpha=0.7, color='purple', edgecolor='cyan')
+        plt.title('Degree Distribution')
+        plt.xlabel('Degree')
+        plt.ylabel('Frequency')
+        plt.savefig("degree_distribution.png")
+        plt.show()
     
 
-    def __str__(self): # REWRITE THIS!!!!!!!!!!!
-
-        idx_vertex = 0
-        string_1 = ""
-        string_2 = ""
-        string_representation = "Nós: "
-        #verificar se é matriz ou lista antes de printar
+    def __str__(self):
+        index = 0
+        a = ""
+        b = ""
+        finalString = "Nodes: "
         if self.representation == "LIST":
-
             for i in self.aList.keys():
-
-                string_1 += f"{i}({idx_vertex}), "
-                string_2 += f"{i}({idx_vertex}): "
-
+                a += f"{i}({index}), "
+                b += f"{i}({index}): "
                 for j in self.aList[i].keys():
-
-                    string_2 += f"{j}, "
-
-                idx_vertex+=1
-
-                string_2 = string_2[0:-2]+"\n"
-
-            string_representation += string_1[0:-2]
-            string_representation += "\nArestas(listas de adjacências):\n"
-            string_representation += string_2
-            
-            #return f"Grafo {self.representation} {self.aList}" ####
-            
-            return string_representation
-        
+                    b += f"{j}, "
+                index += 1
+                b = b[0:-2] + "\n"
+            finalString += a[0:-2]
+            finalString += "\nEdges:\n"
+            finalString += b
+            return finalString
         elif self.representation == "MATRIX":
-
             for i in self.nameDict.keys():
-
-                string_1 += f"{i}({self.nameDict[i]}), "
-                string_2 += f"{i}({self.nameDict[i]}): "
-
+                a += f"{i}({index}), "
+                b += f"{i}({index}): "
                 for j in self.aMatrix[self.nameDict[i]]:
-                    
                     if j == None:
-
                         j = 0
+                    b += f"{j} "
+                index += 1
+                b += "\n"
+            finalString += a[0:-2]
+            finalString += "\nEdges:\n"
+            finalString += b
+            return str(finalString)
+        
+    
+    def to_pajek(self):
+        finalString:str = ""
 
-                    string_2 += f"{j} "
+        configuration:str = ""
+        configuration += f"% directed={self.directed}\n"
+        configuration += f"% weighted={self.weighted}\n"
+        configuration += f"% representation={self.representation}\n"
+        
+        vertices:str = ""
+        vertices += f"*Vertices {len(self.aList) if self.representation == 'LIST' else len(self.nameDict)}\n"
+
+        edges:str = ""
+        edges += f"*arcs\n"
+
+        if self.representation == "LIST":
+            indexes = {vertice: index for index, vertice in enumerate(self.aList.keys())}
+            for index, vertice in enumerate(self.aList.keys()):
+                vertices += f"{index} {vertice}\n"
+
+            for vertice, adjacencies in self.aList.items():
+                verticeIndex = indexes[vertice]
+                for adjacency, weight in adjacencies.items():
+                    adjacencyIndex = indexes[adjacency]
+                    if not self.weighted and weight is not None:
+                        edges += f"{verticeIndex} {adjacencyIndex}\n"
+                    elif self.weighted and weight is not None:
+                        edges += f"{verticeIndex} {adjacencyIndex} {weight}\n"
+        elif self.representation == "MATRIX":
+            for vertice, index in self.nameDict.items():
+                vertices += f"{index} {vertice}\n"
+
+            for vertice, index in self.nameDict.items():
+                for j, weight in enumerate(self.aMatrix[index]):
+                    if not self.weighted and weight is not None:
+                        edges += f"{index} {j}\n"
+                    elif self.weighted and weight is not None:
+                        edges += f"{index} {j} {weight}\n"
+        
+        finalString += configuration
+        finalString += vertices
+        # finalString += "\n\n"
+        finalString += edges
+
+        return finalString
+
                 
-                idx_vertex+=1
-                string_2 += "\n"
             
-            string_representation += string_1[0:-2]
-            string_representation += "\nArestas(matriz):\n"
-            string_representation += string_2
-
-            return string_representation
-                
-            #return f"{self.aMatrix}\n Vértices e index {self.nameDict}"
+        
 
 ############################# TESTS ###############################
 
 
 
-gL = Graph(False, False, "LIST")
-gM = Graph(False, False, "MATRIX")
+# gL = Graph(False, False, "LIST")
+# gM = Graph(False, False, "MATRIX")
 
-# print(gL.find_vertice("A"))
-gL.add_vertice("A")
-# print(gL.find_vertice("A"))
-gL.add_vertice("B")
-gL.add_vertice("C")
-gL.add_vertice("D")
-
-
-gM.add_vertice("A")
-gM.add_vertice("B")
-gM.add_vertice("C")
-gM.add_vertice("D")
+# # print(gL.find_vertice("A"))
+# gL.add_vertice("A")
+# # print(gL.find_vertice("A"))
+# gL.add_vertice("B")
+# gL.add_vertice("C")
+# gL.add_vertice("D")
 
 
-gL.add_edge("A", "C")
-gL.add_edge("B", "A")
-gL.add_edge("C", "A")
-gL.add_edge("C", "D")
-# print(gL.find_edge("A", "C"))
-# print(gL.find_edge("B", "C"))
+# gM.add_vertice("A")
+# gM.add_vertice("B")
+# gM.add_vertice("C")
+# gM.add_vertice("D")
 
-gM.add_edge("A", "C")
-gM.add_edge("B", "A")
-gL.add_edge("C", "A")
-gM.add_edge("C", "D")
-# print(gM.find_edge("A", "C"))
-# print(gM.find_edge("B", "C"))
 
-gL.remove_vertice("D")
-gM.remove_vertice("D")
+# gL.add_edge("A", "C")
+# gL.add_edge("B", "A")
+# gL.add_edge("C", "A")
+# gL.add_edge("C", "D")
+# # print(gL.find_edge("A", "C"))
+# # print(gL.find_edge("B", "C"))
 
-# gL.remove_edge("C", "A")
+# gM.add_edge("A", "C")
+# gM.add_edge("B", "A")
+# gM.add_edge("C", "A")
+# gM.add_edge("C", "D")
+# # print(gM.find_edge("A", "C"))
+# # print(gM.find_edge("B", "C"))
 
-print(f"GL Adjacencies: {gL.get_adjacencies('A')}")
-print(f"GM Adjacencies: {gM.get_adjacencies('A')}")
+# # gL.remove_vertice("D")
+# # gM.remove_vertice("D")
 
-# print(gL.get_weight("B", "C"))
-# print(gM.get_weight("B", "C"))
+# # gL.remove_edge("C", "A")
 
-print(gL)
-print(gM)
+# print(f"GL Adjacencies: {gL.get_adjacencies('A')}")
+# print(f"GM Adjacencies: {gM.get_adjacencies('A')}")
 
-print(gL.aList)
-print(gM.aMatrix)
-print(gM.nameDict)
+# # print(gL.get_weight("B", "C"))
+# # print(gM.get_weight("B", "C"))
+
+# print(gL.width_search("A", "D"))
+# print(gL.depth_search("A", "D"))
+# path, cost, t = gL.dijkstra("A", "D")
+# print(f"Caminho entre A e D{path} com peso {cost} e tempo de {t} segundos")
+
+# print(gM.width_search("A", "D"))
+# print(gM.depth_search("A", "D"))
+# path, cost, t = gM.dijkstra("A", "D")
+# print(f"Caminho entre A e D{path} com peso {cost} e tempo de {t} segundos")
+
+# print(gL)
+# print(gM)
+
+# print(gL.aList)
+# print(gM.aMatrix)
+# print(gM.nameDict)
 
 
 
@@ -342,3 +565,18 @@ print(gM.nameDict)
 # print(gLW.get_weight("A", "C"))
 # print(gLW.get_weight("C", "A"))
 
+# path, cost, t = gLW.dijkstra("A", "D")
+# print(f"Caminho entre A e D{path} com peso {cost} e tempo de {t} segundos")
+
+######################### Other Testing ########################
+
+# print(gL.aList.keys())
+# print(gM.nameDict.keys())
+
+# a = gM.nameDict.keys()
+# b = gL.aList.keys()
+
+# print(b, a)
+
+# for i in b:
+#     print(i)

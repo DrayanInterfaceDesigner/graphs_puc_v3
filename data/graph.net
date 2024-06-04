@@ -1,6 +1,6 @@
 % directed=false
 % weighted=false
-% representation=LISTA
+% representation=LIST
 *Vertices 4
 0 A
 1 D
