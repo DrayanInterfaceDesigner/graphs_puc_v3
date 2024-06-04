@@ -113,7 +113,8 @@ class Graph:
                 return adjacencies
             elif self.representation == "MATRIX":
                 for i in range(len(self.aMatrix[self.nameDict[vertice]])):
-                    if self.aMatrix[self.nameDict[vertice]][i]:
+                    # print(self.aMatrix[self.nameDict[vertice]][i])
+                    if self.aMatrix[self.nameDict[vertice]][i] != None:
                         for key, value in self.nameDict.items():
                             if value == i:
                                 adjacencies[key] = self.nameDict[key]
@@ -198,7 +199,7 @@ class Graph:
             vertice = stack.pop(-1)
             if vertice not in visited:
                 visited.append(vertice)
-            for adjacency in sorted(self.get_adjacencies(vertice)):
+            for adjacency in self.get_adjacencies(vertice):
                 if adjacency not in visited:
                     stack.append(adjacency)
             if vertice == end:
@@ -224,7 +225,7 @@ class Graph:
             vertice = queue.pop(0)
             if vertice not in visited:
                 visited.append(vertice)
-            for adjacency in sorted(self.get_adjacencies(vertice)):
+            for adjacency in self.get_adjacencies(vertice):
                 if adjacency not in visited:
                     queue.append(adjacency)
             if vertice == end:
@@ -366,8 +367,13 @@ class Graph:
         """
 
         if self.representation == "MATRIX":
-            wMatrixGraph = self
-            wMatrix = self.aMatrix.copy()
+            wMatrixGraph = Graph(self.directed, self.weighted, "MATRIX")
+            for i in self.nameDict.keys():
+                wMatrixGraph.add_vertice(i)
+            for i in self.nameDict.keys():
+                for adjacency in self.get_adjacencies(i).keys():
+                    wMatrixGraph.add_edge(i, adjacency, self.aMatrix[self.nameDict[i]][self.nameDict[adjacency]])
+            wMatrix = wMatrixGraph.aMatrix.copy()
         elif self.representation == "LIST":
             # Creates a new matrix graph so that warshall can run
             wMatrixGraph = Graph(self.directed, self.weighted, "MATRIX")
@@ -506,14 +512,56 @@ class Graph:
     def closeness_centrality(self, vertice:str):
         pass
 
-    def excentricity(self, vertice:str):
-        pass
+    def eccentricity(self, vertice:str):
+        if self.find_vertice(vertice) and self.is_connected():
+            if self.representation == "LIST":
+                vertices = self.aList
+            elif self.representation == "MATRIX":
+                vertices = self.nameDict
+            ecc = 0
+            for i in vertices:
+                dfs, time1 = self.depth_search(vertice, i)
+                bfs, time2 = self.width_search(vertice, i)
+                dijkstra, time3, cost = self.dijkstra(vertice, i)
+                print(f"dfs: {dfs}, bfs: {bfs}, dijkstra: {dijkstra}")
+                shortest = 0
+                if len(dfs) <= len(bfs):
+                    shortest = len(dfs)
+                else:
+                    shortest = len(bfs)
+                if len(dijkstra) < shortest:
+                    shortest = len(dijkstra)
+                if shortest > ecc:
+                    ecc = shortest
+            return ecc - 1
+        return None
+
 
     def diameter(self):
-        pass
+        if self.is_connected():
+            if self.representation == "LIST":
+                vertices = self.aList
+            elif self.representation == "MATRIX":
+                vertices = self.nameDict
+            diameter = 0
+            for vertice in vertices:
+                ecc = self.eccentricity(vertice)
+                if ecc > diameter:
+                    diameter = ecc
+            return diameter
 
     def radius(self):
-        pass
+        if self.is_connected():
+            if self.representation == "LIST":
+                vertices = self.aList
+            elif self.representation == "MATRIX":
+                vertices = self.nameDict
+            diameter = 1e10
+            for vertice in vertices:
+                ecc = self.eccentricity(vertice)
+                if ecc < diameter:
+                    diameter = ecc
+            return diameter
 
     def edge_betweenness(self, parent:str, child:str):
         pass
@@ -529,44 +577,75 @@ class Graph:
 
 
 
-# gL = Graph(False, False, "LIST")
-# gM = Graph(False, False, "MATRIX")
+gL = Graph(False, False, "LIST")
+gM = Graph(False, False, "MATRIX")
 
 # # print(gL.find_vertice("A"))
-# gL.add_vertice("A")
-# # print(gL.find_vertice("A"))
-# gL.add_vertice("B")
-# gL.add_vertice("C")
-# gL.add_vertice("D")
+gL.add_vertice("A")
+# print(gL.find_vertice("A"))
+gL.add_vertice("B")
+gL.add_vertice("C")
+gL.add_vertice("D")
+gL.add_vertice("E")
 
 
-# gM.add_vertice("A")
-# gM.add_vertice("B")
-# gM.add_vertice("C")
-# gM.add_vertice("D")
+gM.add_vertice("A")
+gM.add_vertice("B")
+gM.add_vertice("C")
+gM.add_vertice("D")
+gM.add_vertice("E")
 
 
-# gL.add_edge("A", "C")
-# gL.add_edge("B", "A")
-# gL.add_edge("C", "A")
-# gL.add_edge("C", "D")
-# # print(gL.find_edge("A", "C"))
-# # print(gL.find_edge("B", "C"))
+gL.add_edge("A", "C")
+gL.add_edge("B", "A")
+gL.add_edge("C", "A")
+gL.add_edge("C", "D")
+gL.add_edge("C", "E")
+gL.add_edge("D", "E")
+# print(gL.find_edge("A", "C"))
+# print(gL.find_edge("B", "C"))
 
-# gM.add_edge("A", "C")
-# gM.add_edge("B", "A")
-# gM.add_edge("C", "A")
-# gM.add_edge("C", "D")
-# # print(gM.find_edge("A", "C"))
-# # print(gM.find_edge("B", "C"))
+gM.add_edge("A", "C")
+gM.add_edge("B", "A")
+gM.add_edge("C", "A")
+gM.add_edge("C", "D")
+gM.add_edge("C", "E")
+gM.add_edge("D", "E")
+# print(gM.find_edge("A", "C"))
+# print(gM.find_edge("B", "C"))
+
+print(gL.is_connected())
+print(gM.is_connected())
+
+print(gL.eccentricity("A"))
+print(gL.eccentricity("B"))
+print(gL.eccentricity("C"))
+print(gL.eccentricity("D"))
+print(gL.eccentricity("E"))
+
+print(gM.eccentricity("A"))
+print(gM.eccentricity("B"))
+print(gM.eccentricity("C"))
+print(gM.eccentricity("D"))
+print(gM.eccentricity("E"))
+
+print(f"Diameter: {gL.diameter()}")
+print(f"Diameter: {gM.diameter()}")
+
+print(f"Radius: {gL.radius()}")
+print(f"Radius: {gM.radius()}")
 
 # # gL.remove_vertice("D")
 # # gM.remove_vertice("D")
 
 # # gL.remove_edge("C", "A")
 
-# print(f"GL Adjacencies: {gL.get_adjacencies('A')}")
-# print(f"GM Adjacencies: {gM.get_adjacencies('A')}")
+print(f"GL Adjacencies: {gL.get_adjacencies('D')}")
+print(f"GM Adjacencies: {gM.get_adjacencies('A')}")
+print(f"GM Adjacencies: {gM.get_adjacencies('B')}")
+print(f"GM Adjacencies: {gM.get_adjacencies('C')}")
+print(f"GM Adjacencies: {gM.get_adjacencies('D')}")
+
 
 # # print(gL.get_weight("B", "C"))
 # # print(gM.get_weight("B", "C"))
@@ -582,11 +661,11 @@ class Graph:
 # print(f"Caminho entre A e D{path} com peso {cost} e tempo de {t} segundos")
 
 # print(gL)
-# print(gM)
+print(gM)
 
 # print(gL.aList)
-# print(gM.aMatrix)
-# print(gM.nameDict)
+print(gM.aMatrix)
+print(gM.nameDict)
 
 
 
