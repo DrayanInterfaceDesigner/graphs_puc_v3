@@ -1,17 +1,9 @@
 import time
 import matplotlib.pyplot as plt
-from copy import deepcopy
 
-''' TEMPLATE:
-
-        if self.representation == "LIST":
-            pass
-        elif self.representation == "MATRIX":
-            pass
-
-'''
 
 class Graph:
+    """Graph manipulation and representation."""
     def __init__(self, directed: bool, weighted: bool, representation: str):
         self.directed:bool = directed
         self.weighted:bool = weighted
@@ -28,6 +20,7 @@ class Graph:
         
 
     def find_vertice(self, name:str) -> bool:
+        """Finds a vertice by name."""
         if self.representation == "LIST":
             if name in self.aList:
                 return True   
@@ -37,6 +30,7 @@ class Graph:
         return False
 
     def find_edge(self, parent:str, child:str) -> bool:
+        """Finds an edge in the graph using the names of the vertices it connects."""
         if not self.find_vertice(parent) or not self.find_vertice(child):
             return False
         elif self.representation == "LIST":
@@ -48,6 +42,7 @@ class Graph:
         return False
 
     def add_vertice(self, name:str) -> None:
+        """Adds a vertice to the graph."""
         if not self.find_vertice(name):
             if self.representation == "LIST":
                 self.aList.update({name : {}})
@@ -61,6 +56,7 @@ class Graph:
                 self.aMatrix.append(arr)
 
     def add_edge(self, parent:str, child:str, weight:int|float=1) -> None:
+        """Adds an edge to the graph. Takes both connected vertices as parameters."""
         if self.find_vertice(parent) and self.find_vertice(child):
             if self.representation == "LIST":
                 if child not in self.aList[parent].keys():
@@ -74,6 +70,7 @@ class Graph:
                         self.aMatrix[self.nameDict[child]][self.nameDict[parent]] = weight
 
     def remove_vertice(self, name:str) -> None:
+        """Removes a vertice from the graph, as well as any edges that connect to it."""
         if self.find_vertice(name):
             if self.representation == "LIST":
                 del self.aList[name]
@@ -92,6 +89,7 @@ class Graph:
                 del self.nameDict[name]
 
     def remove_edge(self, parent:str, child:str):
+        """Removes an edge from the graph."""
         if self.find_vertice(parent) and self.find_vertice(child):
             if self.representation == "LIST":
                 if child in self.aList[parent].keys():
@@ -106,6 +104,7 @@ class Graph:
 
 
     def get_adjacencies(self, vertice:str) -> list:
+        """Returns a list containing all adjacencies of the vertice."""
         if self.find_vertice(vertice):
             adjacencies = {}
             if self.representation == "LIST":
@@ -122,6 +121,7 @@ class Graph:
 
 
     def get_weight(self, parent:str, child:str) -> (int|float|None):
+        """Returns the weight of an edge. Takes both connected vertices as parameters."""
         if self.find_edge(parent, child):
             if not self.weighted:
                 return 1
@@ -131,6 +131,7 @@ class Graph:
                 return self.aMatrix[self.nameDict[parent]][self.nameDict[child]]
 
     def set_weight(self, parent:str, child:str, weight:int|float) -> None:
+        """Updates an edge's weight. If no such edge exists, creates it."""
         if not self.find_edge(parent, child):
             self.add_edge(parent, child, weight)
         elif self.representation == "LIST":
@@ -144,6 +145,7 @@ class Graph:
 
 
     def out_degree(self, name:str) -> int:
+        """Returns a vertice's outdegree."""
         if self.find_vertice(name):
             if self.representation == "LIST":
                 return len(self.aList[name])
@@ -155,6 +157,7 @@ class Graph:
                 return degree        
 
     def in_degree(self, name:str) -> int:
+        """Returns a vertice's indegree."""
         if self.find_vertice(name):
             degree:int = 0
             if self.representation == "LIST":
@@ -172,6 +175,7 @@ class Graph:
                 return degree
 
     def degree(self, name:str) -> int:
+        """Returns a vertice's degree."""
         if self.find_vertice(name):
             if self.directed:
                 return self.in_degree(name) + self.out_degree(name)
@@ -180,6 +184,7 @@ class Graph:
             
     
     def depth_search(self, start:str, end:str) -> int:
+        """Finds the shortest path to another vertice using a depth-based search."""
         if not self.find_vertice(start) or not self.find_vertice(end):
             return 0
         
@@ -205,6 +210,7 @@ class Graph:
         return visited, total_time
 
     def width_search(self, start:str, end:str) -> int:
+        """Finds the shortest path to another vertice using a width-based search."""
         if not self.find_vertice(start) or not self.find_vertice(end):
             return 0
         
@@ -229,8 +235,8 @@ class Graph:
 
         return visited, total_time
     
-    # dijkstra helper, determines min cost vertice
     def extract_min(self, q, costs):
+        """Dijkstra helper, determines min cost vertice"""
         min_cost_vertice = None
         min_weight = +1e10
         for vertice in q:
@@ -240,6 +246,7 @@ class Graph:
         return min_cost_vertice
 
     def dijkstra(self, start:str, end:str) -> int:
+        """Finds the shortest path to another vertice using dijkstra's algorithm."""
         if not self.find_vertice(start) or not self.find_vertice(end):
             return 0
         
@@ -286,6 +293,7 @@ class Graph:
 
 
     def is_connected(self):
+        """Returns whether a graph is connected."""
         warshall = self.warshall()
         matrix = warshall.aMatrix
         for i in range(len(matrix)):
@@ -295,6 +303,7 @@ class Graph:
         return True
 
     def prim(self):
+        """Returns a graph's minimum spanning tree using Prim's algorithm."""
         if not self.directed and self.weighted:
             if self.is_connected():
                 predecessors = {}
@@ -331,6 +340,7 @@ class Graph:
                 return primGraph, cost
 
     def eulerian(self):
+        """Returns whether a graph is considered eulerian."""
         if self.representation == "MATRIX":
             vertices_list = self.nameDict.keys()
         elif self.representation == "LIST":
@@ -350,6 +360,11 @@ class Graph:
             return False
 
     def warshall(self):
+        """Returns an adjacency matrix representing a graph's transitive closure using Warshall's algorithm.
+        
+        Creates a new graph if the original graph's representation is "LIST", as it needs a matrix to run.
+        """
+
         if self.representation == "MATRIX":
             wMatrixGraph = self
             wMatrix = self.aMatrix.copy()
@@ -380,6 +395,7 @@ class Graph:
         return newGraph
 
     def degree_distribution_histogram(self):
+        """Plots a histogram representing the distribution of degrees throughout the graph."""
         degrees = []
         if self.representation == "LIST":
             vertices = list(self.aList.keys())
@@ -397,6 +413,7 @@ class Graph:
     
 
     def __str__(self):
+        """Defines string representation."""
         index = 0
         a = ""
         b = ""
@@ -430,6 +447,7 @@ class Graph:
         
     
     def to_pajek(self):
+        """Turns the graph into a string to be passed to the parser for pajek persistance."""
         finalString:str = ""
 
         configuration:str = ""
@@ -474,9 +492,38 @@ class Graph:
 
         return finalString
 
+############################# TDE 2 #################################
+
+    def component_extraction(self):
+        pass
+
+    def degree_centrality(self, vertice:str):
+        pass
+
+    def betweenness_centrality(self, vertice:str):
+        pass
+
+    def closeness_centrality(self, vertice:str):
+        pass
+
+    def excentricity(self, vertice:str):
+        pass
+
+    def diameter(self):
+        pass
+
+    def radius(self):
+        pass
+
+    def edge_betweenness(self, parent:str, child:str):
+        pass
+
+    def geodesic_distance(self):
+        pass
+
+    def girvan_newman(self):
+        pass
                 
-            
-        
 
 ############################# TESTS ###############################
 
