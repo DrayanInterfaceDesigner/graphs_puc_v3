@@ -296,7 +296,55 @@ class Graph:
         total_time = end_time - start_time
 
         return path, total_cost, total_time
+    
+    def DJ_kstra(self, start:str) -> list:
+        """Finds the shortest path to all other vertices using dijkstra's algorithm."""
+        if not self.find_vertice(start):
+            return 0
+        
+        if self.representation == "LIST":
+            vertices = self.aList
+        elif self.representation == "MATRIX":
+            vertices = self.nameDict
 
+        distances:dict = {v: float('inf') for v in vertices}
+        distances[start] = 0
+        visited:dict = {v: [] for v in vertices}
+        unvisited = set(vertices)
+        all_paths:dict = {}
+
+        start_time = time.perf_counter()
+
+        while unvisited:
+            current = min(unvisited, key=lambda v: distances[v])
+            unvisited.remove(current)
+            for neighbor in self.get_adjacencies(current):
+                if neighbor in unvisited:
+                    new_distance = distances[current] + self.get_weight(current, neighbor)
+                    if new_distance < distances[neighbor]:
+                        distances[neighbor] = new_distance
+                        # visited[neighbor] = visited[current] + [neighbor]
+                        visited[neighbor] = [current]
+                    elif new_distance == distances[neighbor]:
+                        visited[neighbor].append(visited[current] + [neighbor])
+        
+        for vertice in visited:
+            if vertice == start:
+                all_paths[vertice] = [start]
+            elif distances[vertice] == float('inf'):
+                all_paths[vertice] = []
+            else:
+                paths: list = [[start]]
+                while paths:
+                    path = paths.pop(0)
+                    for v in visited[path[0]]:
+                        new_path = [v] + path
+                        if v == start:
+                            all_paths[vertice] = new_path
+                        else:
+                            paths.append(new_path)
+        
+        return all_paths, time.perf_counter() - start_time
 
     def is_connected(self):
         """Returns whether a graph is connected."""
@@ -527,17 +575,17 @@ class Graph:
             vertices = self.nameDict
 
         nodes_size:int = len(vertices)
-        shortest_paths:list = []
         counter:int = 0 
 
         for v in vertices:
             if v != vertice:
-                path, total_cost, total_time = self.dijkstra(v, vertice)
-                if vertice in path:
-                    shortest_paths.append(path)
-                    counter += 1
-
-        # =============================================
+                all_paths, _ = self.DJ_kstra(v)
+                for x in vertices:
+                    if x == vertice and x == v:
+                        continue
+                    if vertice in all_paths[x]:
+                        counter += 1
+                        
 
         return counter / ((nodes_size - 1) * (nodes_size - 2))
 
