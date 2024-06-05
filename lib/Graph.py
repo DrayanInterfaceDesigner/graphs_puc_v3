@@ -678,16 +678,22 @@ print(f"Radius: {gM.radius()}")
 
 # # gL.remove_edge("C", "A")
 
-print(f"GL Adjacencies: {gL.get_adjacencies('D')}")
-print(f"GM Adjacencies: {gM.get_adjacencies('A')}")
-print(f"GM Adjacencies: {gM.get_adjacencies('B')}")
-print(f"GM Adjacencies: {gM.get_adjacencies('C')}")
-print(f"GM Adjacencies: {gM.get_adjacencies('D')}")
+# print(f"GL Adjacencies: {gL.get_adjacencies('D')}")
+# print(f"GM Adjacencies: {gM.get_adjacencies('A')}")
+# print(f"GM Adjacencies: {gM.get_adjacencies('B')}")
+# print(f"GM Adjacencies: {gM.get_adjacencies('C')}")
+# print(f"GM Adjacencies: {gM.get_adjacencies('D')}")
 
 print(gL.all_paths())
 print(gL.geodesic_distance())
 print(gM.all_paths())
 print(gM.geodesic_distance())
+
+print(gM.degree_centrality("A"))
+print(gM.degree_centrality("B"))
+print(gM.degree_centrality("C"))
+print(gM.degree_centrality("D"))
+print(gM.degree_centrality("E"))
 
 
 # # print(gL.get_weight("B", "C"))
