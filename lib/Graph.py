@@ -623,8 +623,15 @@ class Graph:
     def edge_betweenness(self, parent:str, child:str):
         pass
 
-    def multi_dijkstra(self, asd):
-        pass
+    def multi_dijkstra(self, start:str):
+        if self.find_vertice(start):
+            pi = {}
+            costs = {}
+            vertices = self.aList if self.representation == "LIST" else self.nameDict
+
+            for i in vertices:
+                costs[i] = 1e10
+                pi[i] = []
     
     def all_paths(self):
         pass
