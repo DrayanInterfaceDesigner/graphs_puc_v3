@@ -518,8 +518,29 @@ class Graph:
         return self.degree(vertice) / (len(vertices) - 1)
 
     def betweenness_centrality(self, vertice:str):
+        """Counts the number of times a vertex appears on 
+        the shortest path between any two other vertices."""
 
-        pass
+        if self.representation == "LIST":
+            vertices = self.aList
+        elif self.representation == "MATRIX":
+            vertices = self.nameDict
+
+        nodes_size:int = len(vertices)
+        shortest_paths:list = []
+        counter:int = 0 
+
+        for v in vertices:
+            if v != vertice:
+                path, total_cost, total_time = self.dijkstra(v, vertice)
+                if vertice in path:
+                    shortest_paths.append(path)
+                    counter += 1
+
+        # =============================================
+
+        return counter / ((nodes_size - 1) * (nodes_size - 2))
+
 
     def closeness_centrality(self, vertice:str):
         """Returns the closeness centrality of a given vertice."""
