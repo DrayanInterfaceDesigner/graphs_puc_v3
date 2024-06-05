@@ -26,7 +26,7 @@ def build_graph():
     graph = interpreter.build(extraction)
     return graph
 
-build_graph()
+# build_graph()
 
 # 1) 
 @measure_time
@@ -42,7 +42,7 @@ def most_productive(graph):
     results = sorted(pairs, key=lambda x: x[2], reverse=True)[:20]
     return results
 
-# print(most_productive())
+# print(most_productive(graph))
 
 # 2)
 @measure_time
@@ -50,7 +50,7 @@ def components(graph):
     print("== Question 2 ==")
     return len(graph.component_extraction())
 
-# print(components())
+# print(components(graph))
 
 # 3)
 @measure_time
@@ -58,7 +58,7 @@ def histogram(graph):
     print("== Question 3 ==")
     graph.degree_distribution_histogram()
 
-# histogram()
+histogram(graph)
 
 # 4)
 @measure_time
@@ -66,7 +66,7 @@ def deg_centrality(graph):
     print("== Question 4 ==")
     return sorted(graph.graph_degree_centrality().items(), key=lambda x: x[1], reverse=True)[:10]
 
-# print(deg_centrality())
+# print(deg_centrality(graph))
 
 # 5) demora pa um caray
 @measure_time
@@ -74,7 +74,7 @@ def bet_centrality(graph):
     print("== Question 5 ==")
     return sorted(graph.graph_betweenness_centrality().items(), key=lambda x: x[1], reverse=True)[:10]
 
-# print(bet_centrality())
+# print(bet_centrality(graph))
 
 # # 6) demora pa um caray 2: o retorno
 @measure_time
@@ -82,7 +82,7 @@ def clo_centrality(graph):
     print("== Question 6 ==")
     return sorted(graph.graph_closeness_centrality().items(), key=lambda x: x[1], reverse=True)[:10]
 
-# print(clo_centrality())
+# print(clo_centrality(graph))
 
 # 7, 8) demora pa um caray 3
 # como o grafo nao eh conexo a função não pode rodar. Sendo assim, precisamos repartir o grafo em subgrafos e executar um por um (deus tende piedade de nós)
@@ -108,7 +108,7 @@ def radius(subgraph:Graph):
 def diameter(subgraph:Graph):
     return subgraph.diameter()
 
-# exc, rad, diam = exc_centrality()
+# exc, rad, diam = exc_centrality(graph)
 # print(f"{exc}\n{rad}\n{diam}")
 
 # 9)
@@ -117,7 +117,7 @@ def edge_bet(graph):
     print("== Question 9 ==")
     return sorted(graph.graph_edge_betweenness().items(), key=lambda x: x[1], reverse=True)[:10]
 
-# print(edge_bet())
+# print(edge_bet(graph))
 
 # 10)
 @measure_time
@@ -130,7 +130,7 @@ def avg_geo(graph):
         length.append(len(vertices))
     return sub[length.index(max(length))].avg_geodesic_distance()
 
-# print(avg_geo())
+# print(avg_geo(graph))
 
 # 11)
 @measure_time
@@ -147,7 +147,7 @@ def sub_sub(graph):
         result.append(sorted(g.graph_degree_centrality().items(), key=lambda x: x[1], reverse=True)[:5])
     return result
 
-# print(sub_sub())
+# print(sub_sub(graph))
 
 
 funcs:list = [
