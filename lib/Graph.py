@@ -509,6 +509,7 @@ class Graph:
         pass
 
     def degree_centrality(self, vertice:str)-> float:
+        """Returns the degree centrality of a given vertice."""
         if self.representation == "LIST":
             vertices = self.aList
         elif self.representation == "MATRIX":
@@ -521,6 +522,7 @@ class Graph:
         pass
 
     def closeness_centrality(self, vertice:str):
+        """Returns the closeness centrality of a given vertice."""
         if self.representation == "LIST":
             vertices = self.aList
         elif self.representation == "MATRIX":
