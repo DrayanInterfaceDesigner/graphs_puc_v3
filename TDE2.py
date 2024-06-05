@@ -46,7 +46,7 @@ def most_productive(graph):
 
 # 2)
 @measure_time
-def components():
+def components(graph):
     print("== Question 2 ==")
     return len(graph.component_extraction())
 
@@ -54,7 +54,7 @@ def components():
 
 # 3)
 @measure_time
-def histogram():
+def histogram(graph):
     print("== Question 3 ==")
     graph.degree_distribution_histogram()
 
@@ -62,7 +62,7 @@ def histogram():
 
 # 4)
 @measure_time
-def deg_centrality():
+def deg_centrality(graph):
     print("== Question 4 ==")
     return sorted(graph.graph_degree_centrality().items(), key=lambda x: x[1], reverse=True)[:10]
 
@@ -70,7 +70,7 @@ def deg_centrality():
 
 # 5) demora pa um caray
 @measure_time
-def bet_centrality():
+def bet_centrality(graph):
     print("== Question 5 ==")
     return sorted(graph.graph_betweenness_centrality().items(), key=lambda x: x[1], reverse=True)[:10]
 
@@ -78,7 +78,7 @@ def bet_centrality():
 
 # # 6) demora pa um caray 2: o retorno
 @measure_time
-def clo_centrality():
+def clo_centrality(graph):
     print("== Question 6 ==")
     return sorted(graph.graph_closeness_centrality().items(), key=lambda x: x[1], reverse=True)[:10]
 
@@ -88,7 +88,7 @@ def clo_centrality():
 # como o grafo nao eh conexo a função não pode rodar. Sendo assim, precisamos repartir o grafo em subgrafos e executar um por um (deus tende piedade de nós)
 # Faremos a 8 junto porque girvan_newman demora meses pra rodar.
 @measure_time
-def exc_centrality():
+def exc_centrality(graph):
     print("== Question 7, 8 ==")
     arr = []
     rad = []
@@ -113,7 +113,7 @@ def diameter(subgraph:Graph):
 
 # 9)
 @measure_time
-def edge_bet():
+def edge_bet(graph):
     print("== Question 9 ==")
     return sorted(graph.graph_edge_betweenness().items(), key=lambda x: x[1], reverse=True)[:10]
 
@@ -121,7 +121,7 @@ def edge_bet():
 
 # 10)
 @measure_time
-def avg_geo():
+def avg_geo(graph):
     print("== Question 10 ==")
     sub = graph.create_subgraphs() # 5 componentes que nem a gente viu na questão 2
     length = []
@@ -134,7 +134,7 @@ def avg_geo():
 
 # 11)
 @measure_time
-def sub_sub():
+def sub_sub(graph):
     print("== Question 11 ==")
     sub = graph.create_subgraphs() # 5 componentes que nem a gente viu na questão 2
     length = []
@@ -148,3 +148,37 @@ def sub_sub():
     return result
 
 # print(sub_sub())
+
+
+funcs:list = [
+    most_productive, components, histogram, deg_centrality, 
+    bet_centrality, clo_centrality, exc_centrality, edge_bet, 
+    avg_geo, sub_sub
+]
+
+def run(type:str="LIST"):
+    print(f"Performing tests.")
+    print(f"Graph representation: {type}")
+    print(f"Start time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+    extraction:dict = p.parse(configs={"directed": False, "weighted": True, "representation": type})
+    graph = interpreter.build(extraction)
+
+    for func in funcs:
+        try:
+            print(f"Running {func.__name__}")
+            print(f"Results for {func.__name__}: \n\n{func(graph)}")
+            print(f"\n End of {func.__name__} | End time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        except Exception as e:
+            print(f"Error in {func.__name__}: {e} | Error time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"End of tests. | End time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+
+types:list = ["LIST", "MATRIX"]
+def run_all():
+    for type in types:
+        run(type)
+    
+# run_all()
+    
+            
