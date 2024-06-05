@@ -508,14 +508,35 @@ class Graph:
     def component_extraction(self):
         pass
 
-    def degree_centrality(self, vertice:str):
-        pass
+    def degree_centrality(self, vertice:str)-> float:
+        """Returns the degree centrality of a given vertice."""
+        if self.representation == "LIST":
+            vertices = self.aList
+        elif self.representation == "MATRIX":
+            vertices = self.nameDict
+
+        return self.degree(vertice) / (len(vertices) - 1)
 
     def betweenness_centrality(self, vertice:str):
+
         pass
 
     def closeness_centrality(self, vertice:str):
-        pass
+        """Returns the closeness centrality of a given vertice."""
+        if self.representation == "LIST":
+            vertices = self.aList
+        elif self.representation == "MATRIX":
+            vertices = self.nameDict
+        
+        nodes_size:int = len(vertices)
+        sum_distances:float = 0.0
+
+        for v in vertices:
+            if v != vertice:
+                path, total_cost, total_time = self.dijkstra(v, vertice)
+                sum_distances += total_cost
+
+        return (nodes_size - 1) / sum_distances
 
     def eccentricity(self, vertice:str):
         if self.find_vertice(vertice) and self.is_connected():
