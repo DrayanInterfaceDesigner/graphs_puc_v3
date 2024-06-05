@@ -27,7 +27,6 @@ class Graph:
             self.nameDict = {}
             # {'A': 0, 'B': 1, 'C': 2}
         
-    @measure_time
     def find_vertice(self, name:str) -> bool:
         """Finds a vertice by name."""
         if self.representation == "LIST":
@@ -38,7 +37,6 @@ class Graph:
                 return True
         return False
 
-    @measure_time
     def find_edge(self, parent:str, child:str) -> bool:
         """Finds an edge in the graph using the names of the vertices it connects."""
         if not self.find_vertice(parent) or not self.find_vertice(child):
@@ -51,7 +49,7 @@ class Graph:
                 return True
         return False
 
-    @measure_time
+
     def add_vertice(self, name:str) -> None:
         """Adds a vertice to the graph."""
         if not self.find_vertice(name):
@@ -66,7 +64,6 @@ class Graph:
                     array.append(None)
                 self.aMatrix.append(arr)
 
-    @measure_time
     def add_edge(self, parent:str, child:str, weight:int|float=1) -> None:
         """Adds an edge to the graph. Takes both connected vertices as parameters."""
         if self.find_vertice(parent) and self.find_vertice(child):
@@ -81,7 +78,6 @@ class Graph:
                     if not self.directed:
                         self.aMatrix[self.nameDict[child]][self.nameDict[parent]] = weight
 
-    @measure_time
     def remove_vertice(self, name:str) -> None:
         """Removes a vertice from the graph, as well as any edges that connect to it."""
         if self.find_vertice(name):
@@ -101,7 +97,6 @@ class Graph:
                         self.nameDict[i] -= 1
                 del self.nameDict[name]
 
-    @measure_time
     def remove_edge(self, parent:str, child:str):
         """Removes an edge from the graph."""
         if self.find_vertice(parent) and self.find_vertice(child):
@@ -116,7 +111,6 @@ class Graph:
                     if not self.directed:
                         self.aMatrix[self.nameDict[child]][self.nameDict[parent]] = None
 
-    @measure_time
     def get_adjacencies(self, vertice:str) -> list:
         """Returns a list containing all adjacencies of the vertice."""
         if self.find_vertice(vertice):
@@ -134,7 +128,6 @@ class Graph:
                                 adjacencies[key] = self.nameDict[key]
                 return adjacencies
 
-    @measure_time
     def get_weight(self, parent:str, child:str) -> (int|float|None):
         """Returns the weight of an edge. Takes both connected vertices as parameters."""
         if self.find_edge(parent, child):
@@ -145,7 +138,6 @@ class Graph:
             elif self.representation == "MATRIX":
                 return self.aMatrix[self.nameDict[parent]][self.nameDict[child]]
 
-    @measure_time
     def set_weight(self, parent:str, child:str, weight:int|float) -> None:
         """Updates an edge's weight. If no such edge exists, creates it."""
         if not self.find_edge(parent, child):
@@ -159,7 +151,6 @@ class Graph:
             if not self.directed:
                 self.aMatrix[self.nameDict[child]][self.nameDict[parent]] = weight
 
-    @measure_time
     def out_degree(self, name:str) -> int:
         """Returns a vertice's outdegree."""
         if self.find_vertice(name):
@@ -172,7 +163,6 @@ class Graph:
                         degree += 1
                 return degree        
 
-    @measure_time
     def in_degree(self, name:str) -> int:
         """Returns a vertice's indegree."""
         if self.find_vertice(name):
@@ -191,7 +181,6 @@ class Graph:
                             degree += 1
                 return degree
 
-    @measure_time
     def degree(self, name:str) -> int:
         """Returns a vertice's degree."""
         if self.find_vertice(name):
@@ -200,7 +189,6 @@ class Graph:
             else:
                 return self.out_degree(name)
             
-    @measure_time
     def depth_search(self, start:str, end:str) -> int:
         """Finds the shortest path to another vertice using a depth-based search."""
         if not self.find_vertice(start) or not self.find_vertice(end):
@@ -227,7 +215,6 @@ class Graph:
 
         return visited, total_time
 
-    @measure_time
     def width_search(self, start:str, end:str) -> int:
         """Finds the shortest path to another vertice using a width-based search."""
         if not self.find_vertice(start) or not self.find_vertice(end):
@@ -254,7 +241,6 @@ class Graph:
 
         return visited, total_time
     
-    @measure_time
     def extract_min(self, q, costs):
         """Dijkstra helper, determines min cost vertice"""
         min_cost_vertice = None
@@ -265,7 +251,6 @@ class Graph:
                 min_cost_vertice = vertice
         return min_cost_vertice
 
-    @measure_time
     def dijkstra(self, start:str, end:str, w:bool = False) -> int:
         """Finds the shortest path to another vertice using dijkstra's algorithm."""
         if not self.find_vertice(start) or not self.find_vertice(end):
@@ -317,7 +302,6 @@ class Graph:
 
         return path, total_cost, total_time
 
-    @measure_time
     def is_connected(self):
         """Returns whether a graph is connected."""
         warshall = self.warshall()
@@ -328,7 +312,6 @@ class Graph:
                     return False  
         return True
 
-    @measure_time
     def prim(self):
         """Returns a graph's minimum spanning tree using Prim's algorithm."""
         if not self.directed and self.weighted:
@@ -366,7 +349,6 @@ class Graph:
 
                 return primGraph, cost
 
-    @measure_time
     def eulerian(self):
         """Returns whether a graph is considered eulerian."""
         if self.representation == "MATRIX":
@@ -387,7 +369,6 @@ class Graph:
                 return True
             return False
 
-    @measure_time
     def warshall(self):
         """Returns an adjacency matrix representing a graph's transitive closure using Warshall's algorithm.
         
@@ -681,7 +662,7 @@ class Graph:
                     diameter = ecc
             return diameter
 
-    @measure_time
+
     def graph_edge_betweenness(self):
         """Returns the betweenness centrality of all edges in a graph."""
         edgeDict = {}
@@ -692,7 +673,7 @@ class Graph:
         # print(edgeDict[("A", "B")])
         return edgeDict
 
-    @measure_time
+
     def edge_betweenness(self, parent:str, child:str):
         """Returns the betweenness centrality of a given edge."""
         if self.representation == "LIST":
@@ -719,7 +700,7 @@ class Graph:
         # print(paths)
         return ((sumVar) / (n * (n - 1)))
     
-    @measure_time
+
     def all_edges(self):
         """Returns a list with all edges in a graph."""
         if self.representation == "LIST":
@@ -735,7 +716,7 @@ class Graph:
             done.append(vertice)
         return edges
 
-    @measure_time
+
     def geo_helper(self):
         """Returns the shortest paths between all possible vertices for use with geodesic_distance()."""
         if self.representation == "LIST":
@@ -798,7 +779,7 @@ class Graph:
             subgraphs.append(g)
         return subgraphs
 
-    @measure_time
+
     def multi_dijkstra_helper(self, v, pi):
         """Recursive helper for multi_dijkstra()."""
         paths = []
@@ -815,7 +796,7 @@ class Graph:
         recursion(v, [v])
         return paths
 
-    @measure_time
+
     def multi_dijkstra(self, start:str):
         """Uses dijkstra's algorithm to find all possible shortest paths between a vertice and other vertices."""
         if self.find_vertice(start):
@@ -847,7 +828,7 @@ class Graph:
                         paths.append(p)
             return paths # With duplicates!
     
-    @measure_time
+
     def all_paths(self):
         """Returns all shortest paths between every possible combination of vertices."""
         if self.representation == "LIST":
@@ -864,7 +845,7 @@ class Graph:
                 done.append(v)
             return shortest
 
-    @measure_time 
+ 
     def extraction_search(self, vertice:str, visited:set):
         """Component extraction DFS helper."""
         component = []
@@ -884,216 +865,216 @@ class Graph:
 
 
 
-gL = Graph(False, False, "LIST")
-gM = Graph(False, False, "MATRIX")
+# gL = Graph(False, False, "LIST")
+# gM = Graph(False, False, "MATRIX")
 
+# # # print(gL.find_vertice("A"))
+# gL.add_vertice("A")
 # # print(gL.find_vertice("A"))
-gL.add_vertice("A")
-# print(gL.find_vertice("A"))
-gL.add_vertice("B")
-gL.add_vertice("C")
-gL.add_vertice("D")
-gL.add_vertice("E")
+# gL.add_vertice("B")
+# gL.add_vertice("C")
+# gL.add_vertice("D")
+# gL.add_vertice("E")
 
 
-gM.add_vertice("A")
-gM.add_vertice("B")
-gM.add_vertice("C")
-gM.add_vertice("D")
-gM.add_vertice("E")
+# gM.add_vertice("A")
+# gM.add_vertice("B")
+# gM.add_vertice("C")
+# gM.add_vertice("D")
+# gM.add_vertice("E")
 
 
-gL.add_edge("A", "B")
-gL.add_edge("A", "C")
-gL.add_edge("C", "B")
-gL.add_edge("C", "D")
-gL.add_edge("B", "D")
-gL.add_edge("D", "E")
-# print(gL.find_edge("A", "C"))
-# print(gL.find_edge("B", "C"))
+# gL.add_edge("A", "B")
+# gL.add_edge("A", "C")
+# gL.add_edge("C", "B")
+# gL.add_edge("C", "D")
+# gL.add_edge("B", "D")
+# gL.add_edge("D", "E")
+# # print(gL.find_edge("A", "C"))
+# # print(gL.find_edge("B", "C"))
 
-gM.add_edge("A", "B")
-gM.add_edge("A", "C")
-gM.add_edge("C", "B")
-gM.add_edge("C", "D")
-gM.add_edge("B", "D")
-gM.add_edge("D", "E")
-# print(gM.find_edge("A", "C"))
-# print(gM.find_edge("B", "C"))
+# gM.add_edge("A", "B")
+# gM.add_edge("A", "C")
+# gM.add_edge("C", "B")
+# gM.add_edge("C", "D")
+# gM.add_edge("B", "D")
+# gM.add_edge("D", "E")
+# # print(gM.find_edge("A", "C"))
+# # print(gM.find_edge("B", "C"))
 
-print(gL.all_edges())
-print(gM.all_edges())
+# print(gL.all_edges())
+# print(gM.all_edges())
 
-print(gL.is_connected())
-print(gM.is_connected())
+# print(gL.is_connected())
+# print(gM.is_connected())
 
-print(gL.eccentricity("A"))
-print(gL.eccentricity("B"))
-print(gL.eccentricity("C"))
-print(gL.eccentricity("D"))
-print(gL.eccentricity("E"))
+# print(gL.eccentricity("A"))
+# print(gL.eccentricity("B"))
+# print(gL.eccentricity("C"))
+# print(gL.eccentricity("D"))
+# print(gL.eccentricity("E"))
 
-print(gM.eccentricity("A"))
-print(gM.eccentricity("B"))
-print(gM.eccentricity("C"))
-print(gM.eccentricity("D"))
-print(gM.eccentricity("E"))
+# print(gM.eccentricity("A"))
+# print(gM.eccentricity("B"))
+# print(gM.eccentricity("C"))
+# print(gM.eccentricity("D"))
+# print(gM.eccentricity("E"))
 
-print(f"Diameter: {gL.diameter()}")
-print(f"Diameter: {gM.diameter()}")
+# print(f"Diameter: {gL.diameter()}")
+# print(f"Diameter: {gM.diameter()}")
 
-print(f"Radius: {gL.radius()}")
-print(f"Radius: {gM.radius()}")
+# print(f"Radius: {gL.radius()}")
+# print(f"Radius: {gM.radius()}")
 
-# # gL.remove_vertice("D")
-# # gM.remove_vertice("D")
+# # # gL.remove_vertice("D")
+# # # gM.remove_vertice("D")
 
-# # gL.remove_edge("C", "A")
+# # # gL.remove_edge("C", "A")
 
-# print(f"GL Adjacencies: {gL.get_adjacencies('D')}")
-# print(f"GM Adjacencies: {gM.get_adjacencies('A')}")
-# print(f"GM Adjacencies: {gM.get_adjacencies('B')}")
-# print(f"GM Adjacencies: {gM.get_adjacencies('C')}")
-# print(f"GM Adjacencies: {gM.get_adjacencies('D')}")
+# # print(f"GL Adjacencies: {gL.get_adjacencies('D')}")
+# # print(f"GM Adjacencies: {gM.get_adjacencies('A')}")
+# # print(f"GM Adjacencies: {gM.get_adjacencies('B')}")
+# # print(f"GM Adjacencies: {gM.get_adjacencies('C')}")
+# # print(f"GM Adjacencies: {gM.get_adjacencies('D')}")
 
-print(gL.geo_helper())
-print(gL.geodesic_distance())
-print(gL.avg_geodesic_distance())
-print(gL.all_paths())
-print(gM.geo_helper())
-print(gM.geodesic_distance())
-print(gM.avg_geodesic_distance())
-print(gM.all_paths())
+# print(gL.geo_helper())
+# print(gL.geodesic_distance())
+# print(gL.avg_geodesic_distance())
+# print(gL.all_paths())
+# print(gM.geo_helper())
+# print(gM.geodesic_distance())
+# print(gM.avg_geodesic_distance())
+# print(gM.all_paths())
 
-print("degree centrality:")
+# print("degree centrality:")
 
-print(gM.degree_centrality("A"))
-print(gM.degree_centrality("B"))
-print(gM.degree_centrality("C"))
-print(gM.degree_centrality("D"))
-print(gM.degree_centrality("E"))
+# print(gM.degree_centrality("A"))
+# print(gM.degree_centrality("B"))
+# print(gM.degree_centrality("C"))
+# print(gM.degree_centrality("D"))
+# print(gM.degree_centrality("E"))
 
-print("closeness centrality:")
+# print("closeness centrality:")
 
-print(gM.closeness_centrality("A"))
-print(gM.closeness_centrality("B"))
-print(gM.closeness_centrality("C"))
-print(gM.closeness_centrality("D"))
-print(gM.closeness_centrality("E"))
+# print(gM.closeness_centrality("A"))
+# print(gM.closeness_centrality("B"))
+# print(gM.closeness_centrality("C"))
+# print(gM.closeness_centrality("D"))
+# print(gM.closeness_centrality("E"))
 
-print("betwreenness centrality:")
+# print("betwreenness centrality:")
 
-print(gM.betweenness_centrality("A"))
-print(gM.betweenness_centrality("B"))
-print(gM.betweenness_centrality("C"))
-print(gM.betweenness_centrality("D"))
-print(gM.betweenness_centrality("E"))
+# print(gM.betweenness_centrality("A"))
+# print(gM.betweenness_centrality("B"))
+# print(gM.betweenness_centrality("C"))
+# print(gM.betweenness_centrality("D"))
+# print(gM.betweenness_centrality("E"))
 
-print("edge betweenness:")
+# print("edge betweenness:")
 
-print(gM.edge_betweenness("A", "B"))
-print(gM.edge_betweenness("A", "C"))
-print(gM.edge_betweenness("B", "C"))
-print(gM.edge_betweenness("B", "D"))
-print(gM.edge_betweenness("C", "D"))
-print(gM.edge_betweenness("D", "E"))
+# print(gM.edge_betweenness("A", "B"))
+# print(gM.edge_betweenness("A", "C"))
+# print(gM.edge_betweenness("B", "C"))
+# print(gM.edge_betweenness("B", "D"))
+# print(gM.edge_betweenness("C", "D"))
+# print(gM.edge_betweenness("D", "E"))
 
-print(gM.graph_edge_betweenness())
-print(gM.graph_betweenness_centrality())
-print(gM.graph_closeness_centrality())
-print(gM.graph_degree_centrality())
-print(gM.graph_eccentricity())
-
-
-# # print(gL.get_weight("B", "C"))
-# # print(gM.get_weight("B", "C"))
-
-# print(gL.width_search("A", "D"))
-# print(gL.depth_search("A", "D"))
-# path, cost, t = gL.dijkstra("A", "D")
-# print(f"Caminho entre A e D{path} com peso {cost} e tempo de {t} segundos")
-
-# print(gM.width_search("A", "D"))
-# print(gM.depth_search("A", "D"))
-# path, cost, t = gM.dijkstra("A", "D")
-# print(f"Caminho entre A e D{path} com peso {cost} e tempo de {t} segundos")
-
-# print(gL)
-print(gM)
-
-# print(gL.aList)
-print(gM.aMatrix)
-print(gM.nameDict)
+# print(gM.graph_edge_betweenness())
+# print(gM.graph_betweenness_centrality())
+# print(gM.graph_closeness_centrality())
+# print(gM.graph_degree_centrality())
+# print(gM.graph_eccentricity())
 
 
-################# Weight Testing #################
+# # # print(gL.get_weight("B", "C"))
+# # # print(gM.get_weight("B", "C"))
 
-# gMW = Graph(False, True, "MATRIX")
-# gLW = Graph(False, True, "LIST")
+# # print(gL.width_search("A", "D"))
+# # print(gL.depth_search("A", "D"))
+# # path, cost, t = gL.dijkstra("A", "D")
+# # print(f"Caminho entre A e D{path} com peso {cost} e tempo de {t} segundos")
 
-# gLW.add_vertice("A")
-# gLW.add_vertice("B")
-# gLW.add_vertice("C")
-# gLW.add_vertice("D")
+# # print(gM.width_search("A", "D"))
+# # print(gM.depth_search("A", "D"))
+# # path, cost, t = gM.dijkstra("A", "D")
+# # print(f"Caminho entre A e D{path} com peso {cost} e tempo de {t} segundos")
 
-# gLW.add_edge("A", "C", 4)
-# gLW.add_edge("B", "A", 5)
-# gLW.add_edge("C", "A", 3)
-# gLW.add_edge("C", "D", 2)
+# # print(gL)
+# print(gM)
 
-# print(gLW.get_weight("A", "C"))
+# # print(gL.aList)
+# print(gM.aMatrix)
+# print(gM.nameDict)
 
-# gLW.set_weight("C", "A", 9)
 
-# print(gLW.get_weight("A", "C"))
-# print(gLW.get_weight("C", "A"))
+# ################# Weight Testing #################
 
-# path, cost, t = gLW.dijkstra("A", "D")
-# print(f"Caminho entre A e D{path} com peso {cost} e tempo de {t} segundos")
+# # gMW = Graph(False, True, "MATRIX")
+# # gLW = Graph(False, True, "LIST")
 
-######################### Girvan Testing ###########################
+# # gLW.add_vertice("A")
+# # gLW.add_vertice("B")
+# # gLW.add_vertice("C")
+# # gLW.add_vertice("D")
 
-# girvan = Graph(False, False, "MATRIX")
+# # gLW.add_edge("A", "C", 4)
+# # gLW.add_edge("B", "A", 5)
+# # gLW.add_edge("C", "A", 3)
+# # gLW.add_edge("C", "D", 2)
 
-# girvan.add_vertice("A")
-# girvan.add_vertice("B")
-# girvan.add_vertice("C")
-# girvan.add_vertice("D")
-# girvan.add_vertice("E")
-# girvan.add_vertice("F")
-# girvan.add_vertice("G")
-# girvan.add_vertice("H")
-# girvan.add_vertice("I")
+# # print(gLW.get_weight("A", "C"))
 
-# girvan.add_edge("A", "B")
-# girvan.add_edge("B", "C")
-# girvan.add_edge("C", "A")
-# girvan.add_edge("D", "E")
-# girvan.add_edge("E", "F")
-# girvan.add_edge("F", "D")
-# girvan.add_edge("C", "D")
-# girvan.add_edge("G", "H")
-# girvan.add_edge("H", "I")
-# girvan.add_edge("I", "G")
-# girvan.add_edge("F", "G")
+# # gLW.set_weight("C", "A", 9)
 
-# print(girvan.component_extraction())
+# # print(gLW.get_weight("A", "C"))
+# # print(gLW.get_weight("C", "A"))
 
-# print(girvan)
+# # path, cost, t = gLW.dijkstra("A", "D")
+# # print(f"Caminho entre A e D{path} com peso {cost} e tempo de {t} segundos")
 
-# sub = girvan.girvan_newman(2)
+# ######################### Girvan Testing ###########################
 
-# print(sub[0], sub[1])
+# # girvan = Graph(False, False, "MATRIX")
 
-######################### Other Testing ########################
+# # girvan.add_vertice("A")
+# # girvan.add_vertice("B")
+# # girvan.add_vertice("C")
+# # girvan.add_vertice("D")
+# # girvan.add_vertice("E")
+# # girvan.add_vertice("F")
+# # girvan.add_vertice("G")
+# # girvan.add_vertice("H")
+# # girvan.add_vertice("I")
 
-# print(gL.aList.keys())
-# print(gM.nameDict.keys())
+# # girvan.add_edge("A", "B")
+# # girvan.add_edge("B", "C")
+# # girvan.add_edge("C", "A")
+# # girvan.add_edge("D", "E")
+# # girvan.add_edge("E", "F")
+# # girvan.add_edge("F", "D")
+# # girvan.add_edge("C", "D")
+# # girvan.add_edge("G", "H")
+# # girvan.add_edge("H", "I")
+# # girvan.add_edge("I", "G")
+# # girvan.add_edge("F", "G")
 
-# a = gM.nameDict.keys()
-# b = gL.aList.keys()
+# # print(girvan.component_extraction())
 
-# print(b, a)
+# # print(girvan)
 
-# for i in b:
-#     print(i)
+# # sub = girvan.girvan_newman(2)
+
+# # print(sub[0], sub[1])
+
+# ######################### Other Testing ########################
+
+# # print(gL.aList.keys())
+# # print(gM.nameDict.keys())
+
+# # a = gM.nameDict.keys()
+# # b = gL.aList.keys()
+
+# # print(b, a)
+
+# # for i in b:
+# #     print(i)

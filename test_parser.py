@@ -2,32 +2,36 @@ from lib.Parser import Parser
 from lib.Interpreter import Interpreter
 from lib.Graph import Graph
 import time
-import multiprocessing
 import copy
 from datetime import datetime
+
+save_path = f"data/{datetime.now().strftime('%Y%m%d%H%M%S')}_results.txt"
 
 def write_results_to_txt(results, filename):
     with open(filename, 'w') as f:
         for result in results:
             f.write(f"{result}\n")
 
+def append_time_taken_to_txt(func_name, time_taken, filename):
+    with open(filename, 'a') as f:
+        f.write(f"{func_name} took {time_taken} seconds\n =============== \n")
+    
 def measure_time(func):
     def wrapper(*args, **kwargs):
         start_time = time.perf_counter()
         result = func(*args, **kwargs)
         end_time = time.perf_counter()
         print(f"Execution time of {func.__name__}: {end_time - start_time} seconds")
+        append_time_taken_to_txt(func.__name__, end_time - start_time, save_path)
         return result
     return wrapper
 
-save_path = f"data/{datetime.now().strftime('%Y%m%d%H%M%S')}_results.txt"
 p = Parser('data/tabela_artigos_limpa.csv')
 
 interpreter: Interpreter = Interpreter()
 extraction:dict = p.parse(configs={"directed": False, "weighted": True, "representation": "LIST"})
 
 graph = interpreter.build(extraction)
-
 # print(graph)
 
 # 1) 
@@ -46,8 +50,6 @@ def most_productive(graph):
     write_results_to_txt(results, save_path)
     print("========================================")
     return results
-gc_1 = copy.deepcopy(graph)
-process_1 = multiprocessing.Process(target=most_productive, args=(gc_1,))
 
 # print(most_productive())
 
@@ -71,7 +73,6 @@ def question5(graph):
     print("========================================")
     return result
 gc_5 = copy.deepcopy(graph)
-process_5 = multiprocessing.Process(target=question5, args=(gc_5,))
 
 # print(sorted(graph.graph_betweenness_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
 
@@ -85,7 +86,6 @@ def question6(graph):
     print("========================================")
     return result
 gc_6 = copy.deepcopy(graph)
-process_6 = multiprocessing.Process(target=question6, args=(gc_6,))
 
 # print(sorted(graph.graph_closeness_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
 
@@ -105,7 +105,6 @@ def question7(graph):
     print("========================================")
     return result
 gc_7 = copy.deepcopy(graph)
-process_7 = multiprocessing.Process(target=question7, args=(gc_7,))
 
 # 8) ver questão 7, inclusive faz até mais sentido fazer elas juntas porque a 8 depende da 7, mas é aquela coisa de que não é conexo então tem q fazer um por um.
 
@@ -126,7 +125,9 @@ process_7 = multiprocessing.Process(target=question7, args=(gc_7,))
 
 # Temporizar essa caralha toda
 
-process_1.start()
-process_5.start()
-process_6.start()
-process_7.start()
+
+most_productive(graph)
+# question5(gc_5)
+# question6(gc_6)
+# question7(gc_7)
+
