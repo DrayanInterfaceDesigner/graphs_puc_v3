@@ -533,29 +533,29 @@ class Graph:
 
         return self.degree(vertice) / (len(vertices) - 1)
 
-    def betweenness_centrality(self, vertice:str):
-        """Counts the number of times a vertex appears on 
-        the shortest path between any two other vertices."""
-
+    def betweenness_centrality(self, v:str):
+        """Returns the betweenness centrality of a given vertice."""
         if self.representation == "LIST":
             vertices = self.aList
         elif self.representation == "MATRIX":
             vertices = self.nameDict
-
-        nodes_size:int = len(vertices)
-        counter:int = 0 
-
-        for v in vertices:
-            if v != vertice:
-                all_paths, _ = self.DJ_kstra(v)
-                for x in vertices:
-                    if x == vertice and x == v:
-                        continue
-                    if vertice in x:
-                        counter += 1
-                        
-
-        return counter / ((nodes_size - 1) * (nodes_size - 2))
+        n = len(vertices)
+        sumVar = 0
+        paths = {}
+        pathsWithV = {}
+        totalPaths = self.all_paths()
+        for path in totalPaths:
+            if (path[0], path[-1]) not in paths:
+                paths[(path[0], path[-1])] = 0
+                pathsWithV[(path[0], path[-1])] = 0
+            if v in path and v != path[0] and v != path[-1]:
+                pathsWithV[(path[0], path[-1])] += 1
+            paths[(path[0], path[-1])] += 1
+        for i in paths:
+            sumVar += pathsWithV[i] / paths[i]
+        print(pathsWithV)
+        print(paths)
+        return ((2 * sumVar) / ((n - 1) * (n - 2)))
 
 
     def closeness_centrality(self, vertice:str):
@@ -621,23 +621,39 @@ class Graph:
             return diameter
 
     def edge_betweenness(self, parent:str, child:str):
-        pass
+        if self.representation == "LIST":
+            vertices = self.aList
+        elif self.representation == "MATRIX":
+            vertices = self.nameDict
+        n = len(vertices)
+        sumVar = 0
+        paths = {}
+        pathsWithEdge = {}
+        totalPaths = self.all_paths()
+        for path in totalPaths:
+            if (path[0], path[-1]) not in paths:
+                paths[(path[0], path[-1])] = 0
+            for i in range(len(path) - 1):
+                edge = (path[i], path[i + 1])
+                if edge not in pathsWithEdge:
+                    pass
 
-    def multi_dijkstra(self, start:str):
-        if self.find_vertice(start):
-            pi = {}
-            costs = {}
-            vertices = self.aList if self.representation == "LIST" else self.nameDict
 
-            for i in vertices:
-                costs[i] = 1e10
-                pi[i] = []
-    
-    def all_paths(self):
-        pass
+
+            if (path[0], path[-1]) not in paths:
+                paths[(path[0], path[-1])] = 0
+                pathsWithV[(path[0], path[-1])] = 0
+            if v in path and v != path[0] and v != path[-1]:
+                pathsWithV[(path[0], path[-1])] += 1
+            paths[(path[0], path[-1])] += 1
+        for i in paths:
+            sumVar += pathsWithV[i] / paths[i]
+        print(pathsWithV)
+        print(paths)
+        return ((2 * sumVar) / ((n - 1) * (n - 2)))
 
     def geo_helper(self):
-        """Returns all shortest paths between all possible vertices."""
+        """Returns the shortest paths between all possible vertices for use with geodesic_distance()."""
         if self.representation == "LIST":
             vertices = self.aList
         elif self.representation == "MATRIX":
@@ -660,11 +676,75 @@ class Graph:
         return distance
     
     def avg_geodesic_distance(self):
+        """Returns the average geodesic distance."""
         n = (len(self.aList) if self.representation == "LIST" else len(self.aMatrix))
         return self.geodesic_distance() / ((n * (n - 1)) / 2)
 
     def girvan_newman(self):
         pass
+
+    def multi_dijkstra_helper(self, v, pi):
+        """Recursive helper for multi_dijkstra()."""
+        paths = []
+        def recursion(vertice, path):
+            if not pi[vertice]:
+                if vertice != v:
+                    rPath = path[::-1]
+                    paths.append(rPath)
+                return
+            for adjacency in pi[vertice]:
+                path.append(adjacency)
+                recursion(adjacency, path)
+                path.pop()
+        recursion(v, [v])
+        return paths
+
+    def multi_dijkstra(self, start:str):
+        """Uses dijkstra's algorithm to find all possible shortest paths between a vertice and other vertices."""
+        if self.find_vertice(start):
+            pi = {}
+            costs = {}
+            paths = []
+            vertices = self.aList if self.representation == "LIST" else self.nameDict
+            q = list(vertices.keys())
+            for i in vertices:
+                costs[i] = 1e10
+                pi[i] = []
+            costs[start] = 0.0
+            while len(q) > 0:
+                vertice = self.extract_min(q, costs)
+                if vertice is None:
+                    break
+                q.remove(vertice)
+                for adjacency in self.get_adjacencies(vertice):
+                    newCost = costs[vertice] + self.get_weight(vertice, adjacency)
+                    if newCost < costs[adjacency]:
+                        costs[adjacency] = newCost
+                        pi[adjacency] = [vertice]
+                    elif newCost == costs[adjacency]:
+                        pi[adjacency].append(vertice)   
+            for i in vertices:
+                if vertice != start:
+                    vPaths = self.multi_dijkstra_helper(i, pi)
+                    for p in vPaths:
+                        paths.append(p)
+            return paths # With duplicates!
+    
+    def all_paths(self):
+        """Returns all shortest paths between every possible combination of vertices."""
+        if self.representation == "LIST":
+            vertices = self.aList
+        elif self.representation == "MATRIX":
+            vertices = self.nameDict
+        shortest = []
+        if not self.directed:
+            done = []
+            for v in vertices:
+                for paths in self.multi_dijkstra(v):
+                    if paths[-1] not in done:
+                        shortest.append(paths)
+                done.append(v)
+            return shortest
 
     def depth_first_search_helper(self, node, visited, component):
         """Depth-first search helper function to traverse a component."""
@@ -748,12 +828,14 @@ print(f"Radius: {gM.radius()}")
 # print(f"GM Adjacencies: {gM.get_adjacencies('C')}")
 # print(f"GM Adjacencies: {gM.get_adjacencies('D')}")
 
-print(gL.all_paths())
+print(gL.geo_helper())
 print(gL.geodesic_distance())
 print(gL.avg_geodesic_distance())
-print(gM.all_paths())
+print(gL.all_paths())
+print(gM.geo_helper())
 print(gM.geodesic_distance())
 print(gM.avg_geodesic_distance())
+print(gM.all_paths())
 
 print("degree centrality:")
 
@@ -778,8 +860,6 @@ print(gM.betweenness_centrality("B"))
 print(gM.betweenness_centrality("C"))
 print(gM.betweenness_centrality("D"))
 print(gM.betweenness_centrality("E"))
-
-print(gM.DJ_kstra("A"))
 
 
 # # print(gL.get_weight("B", "C"))
