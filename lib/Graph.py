@@ -95,7 +95,7 @@ class Graph:
                 if child in self.aList[parent].keys():
                     del self.aList[parent][child]
                     if not self.directed:
-                        del self.vertex_list[child][parent]
+                        del self.aList[child][parent]
             elif self.representation == "MATRIX":
                 if self.aMatrix[self.nameDict[parent]][self.nameDict[child]]:
                     self.aMatrix[self.nameDict[parent]][self.nameDict[child]] = None
@@ -505,24 +505,28 @@ class Graph:
 ############################# TDE 2 #################################
 
     def component_extraction(self):
-        """
-            Finds all connected components in the graph.
-        """
-        visited = set()
-        components = []
-
-        if self.representation == "LIST":
-            named_vertices = self.aList
-        elif self.representation == "MATRIX":
-            named_vertices = self.nameDict
-
-        for vertex in named_vertices:
-            if vertex not in visited:
-                component = []
-                self.depth_first_search_helper(vertex, visited, component)
-                components.append(component)
-
+        if not self.directed:
+            components = []
+            visited = set()
+            if self.representation == "LIST":
+                vertices = self.aList
+            elif self.representation == "MATRIX":
+                vertices = self.nameDict
+            for i in vertices:
+                if i not in visited:
+                    component = self.extraction_search(i, visited)
+                    # print(component)
+                    components.append(component)
+        elif self.directed:
+            pass
         return components
+
+    def graph_degree_centrality(self):
+        result = {}
+        vertices = self.aList if self.representation == "LIST" else self.nameDict
+        for v in vertices:
+            result[v] = round(self.degree_centrality(v), 4)
+        return result
 
     def degree_centrality(self, vertice:str)-> float:
         """Returns the degree centrality of a given vertice."""
@@ -532,6 +536,13 @@ class Graph:
             vertices = self.nameDict
 
         return self.degree(vertice) / (len(vertices) - 1)
+    
+    def graph_betweenness_centrality(self):
+        result = {}
+        vertices = self.aList if self.representation == "LIST" else self.nameDict
+        for v in vertices:
+            result[v] = round(self.betweenness_centrality(v), 4)
+        return result
 
     def betweenness_centrality(self, v:str):
         """Returns the betweenness centrality of a given vertice."""
@@ -553,10 +564,16 @@ class Graph:
             paths[(path[0], path[-1])] += 1
         for i in paths:
             sumVar += pathsWithV[i] / paths[i]
-        print(pathsWithV)
-        print(paths)
+        # print(pathsWithV)
+        # print(paths)
         return ((2 * sumVar) / ((n - 1) * (n - 2)))
 
+    def graph_closeness_centrality(self):
+        result = {}
+        vertices = self.aList if self.representation == "LIST" else self.nameDict
+        for v in vertices:
+            result[v] = round(self.closeness_centrality(v), 4)
+        return result
 
     def closeness_centrality(self, vertice:str):
         """Returns the closeness centrality of a given vertice."""
@@ -573,8 +590,16 @@ class Graph:
                 distances += (len(path) - 1)
 
         return (len(vertices) - 1) / distances
+    
+    def graph_eccentricity(self):
+        result = {}
+        vertices = self.aList if self.representation == "LIST" else self.nameDict
+        for v in vertices:
+            result[v] = round(self.eccentricity(v), 4)
+        return result
 
     def eccentricity(self, vertice:str):
+        """Returns a given vertice's eccentricity"""
         if self.find_vertice(vertice) and self.is_connected():
             if self.representation == "LIST":
                 vertices = self.aList
@@ -595,6 +620,7 @@ class Graph:
 
 
     def diameter(self):
+        """Returns a graph's diameter."""
         if self.is_connected():
             if self.representation == "LIST":
                 vertices = self.aList
@@ -608,6 +634,7 @@ class Graph:
             return diameter
 
     def radius(self):
+        """Returns a graph's radius."""
         if self.is_connected():
             if self.representation == "LIST":
                 vertices = self.aList
@@ -620,7 +647,18 @@ class Graph:
                     diameter = ecc
             return diameter
 
+    def graph_edge_betweenness(self):
+        """Returns the betweenness centrality of all edges in a graph."""
+        edgeDict = {}
+        edges = self.all_edges()
+        for edge in edges:
+            # print(edge, edgeDict)
+            edgeDict[tuple(edge)] = self.edge_betweenness(edge[0], edge[1])
+        # print(edgeDict[("A", "B")])
+        return edgeDict
+
     def edge_betweenness(self, parent:str, child:str):
+        """Returns the betweenness centrality of a given edge."""
         if self.representation == "LIST":
             vertices = self.aList
         elif self.representation == "MATRIX":
@@ -633,24 +671,32 @@ class Graph:
         for path in totalPaths:
             if (path[0], path[-1]) not in paths:
                 paths[(path[0], path[-1])] = 0
+                pathsWithEdge[(path[0], path[-1])] = 0
             for i in range(len(path) - 1):
                 edge = (path[i], path[i + 1])
-                if edge not in pathsWithEdge:
-                    pass
-
-
-
-            if (path[0], path[-1]) not in paths:
-                paths[(path[0], path[-1])] = 0
-                pathsWithV[(path[0], path[-1])] = 0
-            if v in path and v != path[0] and v != path[-1]:
-                pathsWithV[(path[0], path[-1])] += 1
+                if path[i] == parent and path[i + 1] == child:
+                    pathsWithEdge[(path[0], path[-1])] += 1
             paths[(path[0], path[-1])] += 1
         for i in paths:
-            sumVar += pathsWithV[i] / paths[i]
-        print(pathsWithV)
-        print(paths)
-        return ((2 * sumVar) / ((n - 1) * (n - 2)))
+            sumVar += pathsWithEdge[i] / paths[i]
+        # print(pathsWithEdge)
+        # print(paths)
+        return ((sumVar) / (n * (n - 1)))
+    
+    def all_edges(self):
+        """Returns a list with all edges in a graph."""
+        if self.representation == "LIST":
+            vertices = self.aList
+        elif self.representation == "MATRIX":
+            vertices = self.nameDict
+        done = []
+        edges = []
+        for vertice in vertices:
+            for vertice2 in vertices:
+                if self.find_edge(vertice, vertice2) and vertice2 not in done:
+                    edges.append([vertice, vertice2])
+            done.append(vertice)
+        return edges
 
     def geo_helper(self):
         """Returns the shortest paths between all possible vertices for use with geodesic_distance()."""
@@ -680,8 +726,36 @@ class Graph:
         n = (len(self.aList) if self.representation == "LIST" else len(self.aMatrix))
         return self.geodesic_distance() / ((n * (n - 1)) / 2)
 
-    def girvan_newman(self):
-        pass
+    def girvan_newman(self, n:int):
+        """Returns n subgraphs after finding communities"""
+        while True:
+            subgraphs = []
+            highestValue = 0
+            toRemove = ()
+            components = []
+            edgeBetweenness = self.graph_edge_betweenness()
+            for edge in edgeBetweenness:
+                if edgeBetweenness[edge] > highestValue:
+                    toRemove = edge
+                    highestValue = edgeBetweenness[edge]
+            print(f"removing: {toRemove[0]}, {toRemove[1]}")
+            self.remove_edge(toRemove[0], toRemove[1])
+            extractedComponents = self.component_extraction()
+            # print(extractedComponents)
+            for c in extractedComponents:
+                components.append(c)
+            # print(len(components))
+            if len(components) >= n:
+                break
+        for i in components:
+            g = Graph(self.directed, self.weighted, self.representation)
+            for vertice in i:
+                g.add_vertice(vertice)
+            edges = self.all_edges()
+            for edge in edges:
+                g.add_edge(edge[0], edge[1])
+            subgraphs.append(g)
+        return subgraphs
 
     def multi_dijkstra_helper(self, v, pi):
         """Recursive helper for multi_dijkstra()."""
@@ -745,14 +819,20 @@ class Graph:
                         shortest.append(paths)
                 done.append(v)
             return shortest
-
-    def depth_first_search_helper(self, node, visited, component):
-        """Depth-first search helper function to traverse a component."""
-        visited.add(node)
-        component.append(node)
-        for neighbor in self.get_adjacencies(node):
-            if neighbor not in visited:
-                self.dfs(neighbor, visited, component)
+        
+    def extraction_search(self, vertice:str, visited:set):
+        """Component extraction DFS helper."""
+        component = []
+        stack = [vertice]
+        while stack:
+            v = stack.pop()
+            if v not in visited:
+                visited.add(v)
+                component.append(v)
+                for adjacency in self.get_adjacencies(v):
+                    if adjacency not in visited:
+                        stack.append(adjacency)
+        return component
                 
 
 ############################# TESTS ###############################
@@ -795,6 +875,9 @@ gM.add_edge("B", "D")
 gM.add_edge("D", "E")
 # print(gM.find_edge("A", "C"))
 # print(gM.find_edge("B", "C"))
+
+print(gL.all_edges())
+print(gM.all_edges())
 
 print(gL.is_connected())
 print(gM.is_connected())
@@ -861,6 +944,21 @@ print(gM.betweenness_centrality("C"))
 print(gM.betweenness_centrality("D"))
 print(gM.betweenness_centrality("E"))
 
+print("edge betweenness:")
+
+print(gM.edge_betweenness("A", "B"))
+print(gM.edge_betweenness("A", "C"))
+print(gM.edge_betweenness("B", "C"))
+print(gM.edge_betweenness("B", "D"))
+print(gM.edge_betweenness("C", "D"))
+print(gM.edge_betweenness("D", "E"))
+
+print(gM.graph_edge_betweenness())
+print(gM.graph_betweenness_centrality())
+print(gM.graph_closeness_centrality())
+print(gM.graph_degree_centrality())
+print(gM.graph_eccentricity())
+
 
 # # print(gL.get_weight("B", "C"))
 # # print(gM.get_weight("B", "C"))
@@ -907,6 +1005,40 @@ print(gM.nameDict)
 
 # path, cost, t = gLW.dijkstra("A", "D")
 # print(f"Caminho entre A e D{path} com peso {cost} e tempo de {t} segundos")
+
+######################### Girvan Testing ###########################
+
+# girvan = Graph(False, False, "MATRIX")
+
+# girvan.add_vertice("A")
+# girvan.add_vertice("B")
+# girvan.add_vertice("C")
+# girvan.add_vertice("D")
+# girvan.add_vertice("E")
+# girvan.add_vertice("F")
+# girvan.add_vertice("G")
+# girvan.add_vertice("H")
+# girvan.add_vertice("I")
+
+# girvan.add_edge("A", "B")
+# girvan.add_edge("B", "C")
+# girvan.add_edge("C", "A")
+# girvan.add_edge("D", "E")
+# girvan.add_edge("E", "F")
+# girvan.add_edge("F", "D")
+# girvan.add_edge("C", "D")
+# girvan.add_edge("G", "H")
+# girvan.add_edge("H", "I")
+# girvan.add_edge("I", "G")
+# girvan.add_edge("F", "G")
+
+# print(girvan.component_extraction())
+
+# print(girvan)
+
+# sub = girvan.girvan_newman(2)
+
+# print(sub[0], sub[1])
 
 ######################### Other Testing ########################
 
