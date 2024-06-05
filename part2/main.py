@@ -46,6 +46,11 @@ def data_to_graphdata(df:pd.DataFrame) -> (list | dict):
     return vertices, connections
 
 vertices, connections = data_to_graphdata(df)
+# for
+
+
+print(connections)
+exit()
 
 g = Graph()
 g.add_vertices(vertices)
