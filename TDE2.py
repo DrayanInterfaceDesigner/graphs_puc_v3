@@ -5,24 +5,13 @@ import time
 import copy
 from datetime import datetime
 
-save_path = f"data/{datetime.now().strftime('%Y%m%d%H%M%S')}_results.txt"
 
-def write_results_to_txt(results, filename):
-    with open(filename, 'w') as f:
-        for result in results:
-            f.write(f"{result}\n")
-
-def append_time_taken_to_txt(func_name, time_taken, filename):
-    with open(filename, 'a') as f:
-        f.write(f"{func_name} took {time_taken} seconds\n =============== \n")
-    
 def measure_time(func):
     def wrapper(*args, **kwargs):
         start_time = time.perf_counter()
         result = func(*args, **kwargs)
         end_time = time.perf_counter()
         print(f"Execution time of {func.__name__}: {end_time - start_time} seconds")
-        append_time_taken_to_txt(func.__name__, end_time - start_time, save_path)
         return result
     return wrapper
 
@@ -46,112 +35,111 @@ def most_productive(graph):
             if not any((v == vertice and w == adjacency) or (v == adjacency and w == vertice) for v, w, p in pairs):
                 pairs.append((vertice, adjacency, weight))
     results = sorted(pairs, key=lambda x: x[2], reverse=True)[:20]
-    print(results)
-    write_results_to_txt(results, save_path)
-    print("========================================")
     return results
 
 # print(most_productive())
 
 # 2)
-# print(len(graph.component_extraction()))
+@measure_time
+def components():
+    print("== Question 2 ==")
+    return len(graph.component_extraction())
+
+# print(components())
 
 # 3)
-# graph.degree_distribution_histogram()
+@measure_time
+def histogram():
+    print("== Question 3 ==")
+    graph.degree_distribution_histogram()
+
+# histogram()
 
 # 4)
-# print(sorted(graph.graph_degree_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
+@measure_time
+def deg_centrality():
+    print("== Question 4 ==")
+    return sorted(graph.graph_degree_centrality().items(), key=lambda x: x[1], reverse=True)[:10]
+
+# print(deg_centrality())
 
 # 5) demora pa um caray
+@measure_time
+def bet_centrality():
+    print("== Question 5 ==")
+    return sorted(graph.graph_betweenness_centrality().items(), key=lambda x: x[1], reverse=True)[:10]
 
-# @measure_time
-# def question5(graph):
-#     print("== Question 5 ==")
-#     result = sorted(graph.graph_betweenness_centrality().items(), key=lambda x: x[1], reverse=True)[:20]
-#     print(result)
-#     write_results_to_txt(result, save_path)
-#     print("========================================")
-#     return result
-# gc_5 = copy.deepcopy(graph)
-
-# # print(sorted(graph.graph_betweenness_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
+# print(bet_centrality())
 
 # # 6) demora pa um caray 2: o retorno
-# @measure_time
-# def question6(graph):
-#     print("== Question 6 ==")
-#     result = sorted(graph.graph_closeness_centrality().items(), key=lambda x: x[1], reverse=True)[:20]
-#     print(result)
-#     write_results_to_txt(result, save_path)
-#     print("========================================")
-#     return result
-# gc_6 = copy.deepcopy(graph)
+@measure_time
+def clo_centrality():
+    print("== Question 6 ==")
+    return sorted(graph.graph_closeness_centrality().items(), key=lambda x: x[1], reverse=True)[:10]
 
-# # print(sorted(graph.graph_closeness_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
+# print(clo_centrality())
 
-# # 7) demora pa um caray 3 e olha que eu nem botei os outros 4 subgrafos pra rodar. saporra nem chegou no pogger
-# # como o grafo nao eh conexo a função não pode rodar. Sendo assim, precisamos repartir o grafo em subgrafos e executar um por um (deus tende piedade de nós)
-# # sub = graph.girvan_newman(5) # 5 componentes que nem a gente viu na questão 2
-# # print("pogger!")
-# # print(sorted(sub[0].graph_excentricity().items(), key=lambda x: x[1], reverse=True)[:10])
-
-# @measure_time
-# def question7(graph):
-#     print("== Question 7 ==")
-#     sub = graph.girvan_newman(5)
-#     result = sorted(sub[0].graph_excentricity().items(), key=lambda x: x[1], reverse=True)[:20]
-#     print(result)
-#     write_results_to_txt(result, save_path)
-#     print("========================================")
-#     return result
-# gc_7 = copy.deepcopy(graph)
-
-# # 8) ver questão 7, inclusive faz até mais sentido fazer elas juntas porque a 8 depende da 7, mas é aquela coisa de que não é conexo então tem q fazer um por um.
-
-# # 9)
-# # print(sorted(graph.graph_edge_betweenness().items(), key=lambda x: x[1], reverse=True)[:10])
-
-# # 10)
+# 7, 8) demora pa um caray 3
+# como o grafo nao eh conexo a função não pode rodar. Sendo assim, precisamos repartir o grafo em subgrafos e executar um por um (deus tende piedade de nós)
+# Faremos a 8 junto porque girvan_newman demora meses pra rodar.
+@measure_time
+def exc_centrality():
+    print("== Question 7, 8 ==")
+    arr = []
+    rad = []
+    diam = []
+    sub = graph.girvan_newman(5) # 5 componentes que nem a gente viu na questão 2
+    for g in sub:
+        arr.append(sub[g].graph_excentricity().items())
+        rad.append(radius(g))
+        diam.append(diameter(g))
+    return (sorted(arr, key=lambda x: x[1], reverse=True)[:10]), rad, diam
 
 @measure_time
-def question10(graph):
+def radius(subgraph:Graph):
+    return subgraph.radius()
+
+@measure_time
+def diameter(subgraph:Graph):
+    return subgraph.diameter()
+
+# exc, rad, diam = exc_centrality()
+# print(f"{exc}\n{rad}\n{diam}")
+
+# 9)
+@measure_time
+def edge_bet():
+    print("== Question 9 ==")
+    return sorted(graph.graph_edge_betweenness().items(), key=lambda x: x[1], reverse=True)[:10]
+
+# print(edge_bet())
+
+# 10)
+@measure_time
+def avg_geo():
     print("== Question 10 ==")
-    sub = graph.create_subgraphs()
+    sub = graph.create_subgraphs() # 5 componentes que nem a gente viu na questão 2
     length = []
     for g in sub:
         vertices = g.aList if g.representation == "LIST" else g.nameDict
         length.append(len(vertices))
-    result = sub[length.index(max(length))].avg_geodesic_distance()
-    print(result)
-    write_results_to_txt(result, save_path)
-    print("========================================")
-    return result
-# sub = graph.create_subgraphs() # 5 componentes que nem a gente viu na questão 2
-# print("pogger!")
-# length = []
-# for g in sub:
-#     vertices = g.aList if g.representation == "LIST" else g.nameDict
-#     length.append(len(vertices))
+    return sub[length.index(max(length))].avg_geodesic_distance()
 
-# sub[length.index(max(length))].avg_geodesic_distance()
+# print(avg_geo())
 
 # 11)
-# sub = graph.create_subgraphs() # 5 componentes que nem a gente viu na questão 2
-# print("pogger!")
-# length = []
-# for g in sub:
-#     vertices = g.aList if g.representation == "LIST" else g.nameDict
-#     length.append(len(vertices))
-# sub2 = sub[0].girvan_newman(4)
-# for g in sub2:
-#   print(sorted(g.graph_degree_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
+@measure_time
+def sub_sub():
+    print("== Question 11 ==")
+    sub = graph.create_subgraphs() # 5 componentes que nem a gente viu na questão 2
+    length = []
+    result = []
+    for g in sub:
+        vertices = g.aList if g.representation == "LIST" else g.nameDict
+        length.append(len(vertices))
+    sub2 = sub[length.index(max(length))].girvan_newman(4)
+    for g in sub2:
+        result.append(sorted(g.graph_degree_centrality().items(), key=lambda x: x[1], reverse=True)[:5])
+    return result
 
-# # Temporizar essa caralha toda
-
-
-# most_productive(graph)
-# question5(gc_5)
-# question6(gc_6)
-# question7(gc_7)
-question10(graph)
-
+# print(sub_sub())

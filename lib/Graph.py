@@ -509,7 +509,6 @@ class Graph:
 
 ############################# TDE 2 #################################
 
-    @measure_time
     def component_extraction(self):
         if not self.directed:
             components = []
@@ -523,8 +522,6 @@ class Graph:
                     component = self.extraction_search(i, visited)
                     # print(component)
                     components.append(component)
-        elif self.directed:
-            pass
         return components
     
     def create_subgraphs(self):
@@ -540,7 +537,6 @@ class Graph:
             subgraphs.append(g)
         return subgraphs
 
-    @measure_time
     def graph_degree_centrality(self):
         result = {}
         vertices = self.aList if self.representation == "LIST" else self.nameDict
@@ -548,7 +544,6 @@ class Graph:
             result[v] = round(self.degree_centrality(v), 4)
         return result
 
-    @measure_time
     def degree_centrality(self, vertice:str)-> float:
         """Returns the degree centrality of a given vertice."""
         if self.representation == "LIST":
@@ -558,7 +553,6 @@ class Graph:
 
         return self.degree(vertice) / (len(vertices) - 1)
     
-    @measure_time
     def graph_betweenness_centrality(self):
         result = {}
         vertices = self.aList if self.representation == "LIST" else self.nameDict
@@ -566,7 +560,6 @@ class Graph:
             result[v] = round(self.betweenness_centrality(v), 4)
         return result
 
-    @measure_time
     def betweenness_centrality(self, v:str):
         """Returns the betweenness centrality of a given vertice."""
         if self.representation == "LIST":
@@ -591,7 +584,6 @@ class Graph:
         # print(paths)
         return ((2 * sumVar) / ((n - 1) * (n - 2)))
 
-    @measure_time
     def graph_closeness_centrality(self):
         result = {}
         vertices = self.aList if self.representation == "LIST" else self.nameDict
@@ -599,7 +591,6 @@ class Graph:
             result[v] = round(self.closeness_centrality(v), 4)
         return result
 
-    @measure_time
     def closeness_centrality(self, vertice:str):
         """Returns the closeness centrality of a given vertice."""
         if self.representation == "LIST":
@@ -616,7 +607,6 @@ class Graph:
 
         return (len(vertices) - 1) / distances
     
-    @measure_time
     def graph_eccentricity(self):
         result = {}
         vertices = self.aList if self.representation == "LIST" else self.nameDict
@@ -624,7 +614,6 @@ class Graph:
             result[v] = round(self.eccentricity(v), 4)
         return result
 
-    @measure_time
     def eccentricity(self, vertice:str):
         """Returns a given vertice's eccentricity"""
         if self.find_vertice(vertice) and self.is_connected():
@@ -645,7 +634,6 @@ class Graph:
             return ecc - 1
         return None
 
-    @measure_time
     def diameter(self):
         """Returns a graph's diameter."""
         if self.is_connected():
@@ -660,7 +648,6 @@ class Graph:
                     diameter = ecc
             return diameter
 
-    @measure_time
     def radius(self):
         """Returns a graph's radius."""
         if self.is_connected():
@@ -746,7 +733,6 @@ class Graph:
             done.append(vertice)
         return geo
     
-    @measure_time
     def geodesic_distance(self):
         """Returns the sum of the distances of the shortest paths between all possible vertices."""
         distance = 0
@@ -754,13 +740,11 @@ class Graph:
             distance += (len(path) - 1)
         return distance
     
-    @measure_time
     def avg_geodesic_distance(self):
         """Returns the average geodesic distance."""
         n = (len(self.aList) if self.representation == "LIST" else len(self.nameDict))
         return self.geodesic_distance() / ((n * (n - 1)) / 2)
 
-    @measure_time
     def girvan_newman(self, n:int):
         """Returns n subgraphs after finding communities"""
         while True:
@@ -875,8 +859,6 @@ class Graph:
                 
 
 ############################# TESTS ###############################
-
-
 
 # gL = Graph(False, False, "LIST")
 # gM = Graph(False, False, "MATRIX")
