@@ -79,7 +79,7 @@ arestas_pesos = [(e.source, e.target, e["weight"]) for e in g.es]
 arestas_pesos.sort(key=lambda x: x[2], reverse=True)
 
 # Selecionar os 10 pares mais produtivos
-pares_mais_produtivos = arestas_pesos[:10]
+pares_mais_produtivos = arestas_pesos[:20]
 
 # Exibir os pares mais produtivos
 print("10 pares de autores mais produtivos:")
@@ -101,7 +101,7 @@ print("2) Question:")
 # arestas_pesos.sort(key=lambda x: x[2], reverse=True)
 
 # # Selecionar os 10 pares mais produtivos
-# pares_mais_produtivos = arestas_pesos[:10]
+# pares_mais_produtivos = arestas_pesos[:20]
 
 # # Exibir os pares mais produtivos
 # for par in pares_mais_produtivos:
@@ -137,7 +137,7 @@ centralidade_por_autor = {g.vs[i]["name"]: centralidade_grau[i] for i in range(g
 autores_ordenados = sorted(centralidade_por_autor.items(), key=lambda item: item[1], reverse=True)
 
 # Selecionar os 10 autores mais influentes
-top_10_influentes = autores_ordenados[:10]
+top_10_influentes = autores_ordenados[:20]
 
 # Exibir os 10 autores mais influentes
 print("10 autores mais influentes (centralidade de grau):")
@@ -167,7 +167,7 @@ betweenness_dict = {v: betweenness[i] for i, v in enumerate(g.vs)}
 autores_ordenados = sorted(betweenness_dict.items(), key=lambda x: x[1], reverse=True)
 
 # Selecionar os 10 autores mais influentes
-top_10_influentes = autores_ordenados[:10]
+top_10_influentes = autores_ordenados[:20]
 
 # Exibir os 10 autores mais influentes pela centralidade de intermediação
 print("\n10 autores mais influentes (centralidade de intermediação):")
@@ -198,7 +198,7 @@ closeness_dict = {v: closeness[i] for i, v in enumerate(g.vs)}
 autores_ordenados = sorted(closeness_dict.items(), key=lambda x: x[1], reverse=True)
 
 # Selecionar os 10 autores mais influentes
-top_10_influentes = autores_ordenados[:10]
+top_10_influentes = autores_ordenados[:20]
 
 # Exibir os 10 autores mais influentes pela centralidade de proximidade
 print("\n10 autores mais influentes (centralidade de proximidade):")
@@ -227,7 +227,7 @@ eccentricity_dict = {v: eccentricity[i] for i, v in enumerate(g.vs)}
 autores_ordenados = sorted(eccentricity_dict.items(), key=lambda x: x[1])
 
 # Selecionar os 10 autores mais influentes (com menor excentricidade)
-top_10_influentes = autores_ordenados[:10]
+top_10_influentes = autores_ordenados[:20]
 
 # Exibir os 10 autores mais influentes pela centralidade de excentricidade
 print("\n10 autores mais influentes (centralidade de excentricidade):")
@@ -280,7 +280,7 @@ print("9) Question:")
 centralidade_intermediação_arestas = g.edge_betweenness()
 
 # Obter os índices das 10 arestas mais relevantes
-indices_arestas_mais_relevantes_intermediação = sorted(range(len(centralidade_intermediação_arestas)), key=lambda i: centralidade_intermediação_arestas[i], reverse=True)[:10]
+indices_arestas_mais_relevantes_intermediação = sorted(range(len(centralidade_intermediação_arestas)), key=lambda i: centralidade_intermediação_arestas[i], reverse=True)[:20]
 
 # Exibir as 10 arestas mais relevantes
 for indice in indices_arestas_mais_relevantes_intermediação:
