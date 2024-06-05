@@ -505,7 +505,24 @@ class Graph:
 ############################# TDE 2 #################################
 
     def component_extraction(self):
-        pass
+        """
+            Finds all connected components in the graph.
+        """
+        visited = set()
+        components = []
+
+        if self.representation == "LIST":
+            named_vertices = self.aList
+        elif self.representation == "MATRIX":
+            named_vertices = self.nameDict
+
+        for vertex in named_vertices:
+            if vertex not in visited:
+                component = []
+                self.depth_first_search_helper(vertex, visited, component)
+                components.append(component)
+
+        return components
 
     def degree_centrality(self, vertice:str)-> float:
         """Returns the degree centrality of a given vertice."""
@@ -641,6 +658,14 @@ class Graph:
 
     def girvan_newman(self):
         pass
+
+    def depth_first_search_helper(self, node, visited, component):
+        """Depth-first search helper function to traverse a component."""
+        visited.add(node)
+        component.append(node)
+        for neighbor in self.get_adjacencies(node):
+            if neighbor not in visited:
+                self.dfs(neighbor, visited, component)
                 
 
 ############################# TESTS ###############################
