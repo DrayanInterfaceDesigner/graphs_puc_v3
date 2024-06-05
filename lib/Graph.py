@@ -566,8 +566,25 @@ class Graph:
     def edge_betweenness(self, parent:str, child:str):
         pass
 
+    def all_paths(self):
+        """Returns all shortest paths between all possible vertices."""
+        if self.representation == "LIST":
+            vertices = self.aList
+        elif self.representation == "MATRIX":
+            vertices = self.nameDict
+        geo = []
+        done = []
+        for vertice in vertices:
+            for vertice2 in vertices:
+                if vertice != vertice2 and vertice2 not in done:
+                    dijkstra, time3, cost = self.dijkstra(vertice, vertice2, True)
+                    geo.append(dijkstra)
+            done.append(vertice)
+        return geo
+    
     def geodesic_distance(self):
-        pass
+        """Returns total number of shortest paths between all possible vertices."""
+        return len(self.all_paths())
 
     def girvan_newman(self):
         pass
@@ -646,6 +663,11 @@ print(f"GM Adjacencies: {gM.get_adjacencies('B')}")
 print(f"GM Adjacencies: {gM.get_adjacencies('C')}")
 print(f"GM Adjacencies: {gM.get_adjacencies('D')}")
 
+print(gL.all_paths())
+print(gL.geodesic_distance())
+print(gM.all_paths())
+print(gM.geodesic_distance())
+
 
 # # print(gL.get_weight("B", "C"))
 # # print(gM.get_weight("B", "C"))
@@ -666,7 +688,6 @@ print(gM)
 # print(gL.aList)
 print(gM.aMatrix)
 print(gM.nameDict)
-
 
 
 ################# Weight Testing #################
