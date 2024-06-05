@@ -33,7 +33,6 @@ class Interpreter:
                 graph.add_vertice(name)
     
     def interpret_edges(self, graph:Graph, parsed:dict) -> None:
-        print(parsed)
         connections:list = parsed['connections']
         vertices:list = parsed['vertices']
 
