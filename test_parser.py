@@ -1,6 +1,16 @@
 from lib.Parser import Parser
 from lib.Interpreter import Interpreter
 from lib.Graph import Graph
+import time
+
+def measure_time(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.perf_counter()
+        result = func(*args, **kwargs)
+        end_time = time.perf_counter()
+        print(f"Execution time of {func.__name__}: {end_time - start_time} seconds")
+        return result
+    return wrapper
 
 p = Parser('data/tabela_artigos_limpa.csv')
 
@@ -12,6 +22,7 @@ graph = interpreter.build(extraction)
 # print(graph)
 
 # 1) 
+@measure_time
 def most_productive():
     pairs = []
     for vertice in (graph.aList if graph.representation == "LIST" else graph.nameDict):
@@ -34,16 +45,16 @@ def most_productive():
 # print(sorted(graph.graph_degree_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
 
 # 5) demora pa um caray
-# print(sorted(graph.graph_betweenness_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
+print(sorted(graph.graph_betweenness_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
 
 # 6) demora pa um caray 2: o retorno
-# print(sorted(graph.graph_closeness_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
+print(sorted(graph.graph_closeness_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
 
 # 7) demora pa um caray 3 e olha que eu nem botei os outros 4 subgrafos pra rodar. saporra nem chegou no pogger
 # como o grafo nao eh conexo a função não pode rodar. Sendo assim, precisamos repartir o grafo em subgrafos e executar um por um (deus tende piedade de nós)
-# sub = graph.girvan_newman(5) # 5 componentes que nem a gente viu na questão 2
-# print("pogger!")
-# print(sorted(sub[0].graph_closeness_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
+sub = graph.girvan_newman(5) # 5 componentes que nem a gente viu na questão 2
+print("pogger!")
+print(sorted(sub[0].graph_closeness_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
 
 # 8) ver questão 7, inclusive faz até mais sentido fazer elas juntas porque a 8 depende da 7, mas é aquela coisa de que não é conexo então tem q fazer um por um.
 
