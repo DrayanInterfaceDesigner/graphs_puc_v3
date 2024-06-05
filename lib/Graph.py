@@ -624,8 +624,15 @@ class Graph:
         return geo
     
     def geodesic_distance(self):
-        """Returns total number of shortest paths between all possible vertices."""
-        return len(self.all_paths())
+        """Returns the sum of the distances of the shortest paths between all possible vertices."""
+        distance = 0
+        for path in self.all_paths():
+            distance += (len(path) - 1)
+        return distance
+    
+    def avg_geodesic_distance(self):
+        n = (len(self.aList) if self.representation == "LIST" else len(self.aMatrix))
+        return self.geodesic_distance() / ((n * (n - 1)) / 2)
 
     def girvan_newman(self):
         pass
@@ -706,14 +713,26 @@ print(f"Radius: {gM.radius()}")
 
 print(gL.all_paths())
 print(gL.geodesic_distance())
+print(gL.avg_geodesic_distance())
 print(gM.all_paths())
 print(gM.geodesic_distance())
+print(gM.avg_geodesic_distance())
+
+print("degree centrality:")
 
 print(gM.degree_centrality("A"))
 print(gM.degree_centrality("B"))
 print(gM.degree_centrality("C"))
 print(gM.degree_centrality("D"))
 print(gM.degree_centrality("E"))
+
+print("closeness centrality:")
+
+print(gM.closeness_centrality("A"))
+print(gM.closeness_centrality("B"))
+print(gM.closeness_centrality("C"))
+print(gM.closeness_centrality("D"))
+print(gM.closeness_centrality("E"))
 
 
 # # print(gL.get_weight("B", "C"))
