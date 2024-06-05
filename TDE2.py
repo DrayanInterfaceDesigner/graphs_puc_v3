@@ -112,15 +112,15 @@ def most_productive(graph):
 # # print(sorted(graph.graph_edge_betweenness().items(), key=lambda x: x[1], reverse=True)[:10])
 
 # # 10)
-sub = graph.create_subgraphs() # 5 componentes que nem a gente viu na questão 2
-print("pogger!")
-length = []
-for g in sub:
-    vertices = g.aList if g.representation == "LIST" else g.nameDict
-    length.append(len(vertices))
+# sub = graph.create_subgraphs() # 5 componentes que nem a gente viu na questão 2
+# print("pogger!")
+# length = []
+# for g in sub:
+#     vertices = g.aList if g.representation == "LIST" else g.nameDict
+#     length.append(len(vertices))
 
-# botar função que compara o número de vértices de cada subgrafo aqui
-sub[length.index(max(length))].avg_geodesic_distance()
+# # botar função que compara o número de vértices de cada subgrafo aqui
+# sub[length.index(max(length))].avg_geodesic_distance()
 
 # 11)
 # sub = graph.create_subgraphs() # 5 componentes que nem a gente viu na questão 2
@@ -141,3 +141,4 @@ sub[length.index(max(length))].avg_geodesic_distance()
 # question6(gc_6)
 # question7(gc_7)
 
+print(graph.graph_edge_betweenness())
