@@ -18,10 +18,15 @@ def measure_time(func):
 p = Parser('data/tabela_artigos_limpa.csv')
 
 interpreter: Interpreter = Interpreter()
-extraction:dict = p.parse(configs={"directed": False, "weighted": True, "representation": "LIST"})
-
+extraction:dict = p.parse(configs={"directed": False, "weighted": True, "representation": "MATRIX"})
 graph = interpreter.build(extraction)
-# print(graph)
+
+@measure_time
+def build_graph():
+    graph = interpreter.build(extraction)
+    return graph
+
+build_graph()
 
 # 1) 
 @measure_time

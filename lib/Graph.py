@@ -510,6 +510,7 @@ class Graph:
 ############################# TDE 2 #################################
 
     def component_extraction(self):
+        """Returns a list with all separate components in a non-directed graph."""
         if not self.directed:
             components = []
             visited = set()
@@ -525,6 +526,7 @@ class Graph:
         return components
     
     def create_subgraphs(self):
+        """Creates subgraphs from a graph's components."""
         subgraphs = []
         components = self.component_extraction()
         for i in components:
@@ -538,6 +540,7 @@ class Graph:
         return subgraphs
 
     def graph_degree_centrality(self):
+        """Returns the degree centrality of all vertices in a graph."""
         result = {}
         vertices = self.aList if self.representation == "LIST" else self.nameDict
         for v in vertices:
@@ -554,6 +557,7 @@ class Graph:
         return self.degree(vertice) / (len(vertices) - 1)
     
     def graph_betweenness_centrality(self):
+        """Returns the betweenness of all vertices in a graph."""
         result = {}
         vertices = self.aList if self.representation == "LIST" else self.nameDict
         for v in vertices:
@@ -585,6 +589,7 @@ class Graph:
         return ((2 * sumVar) / ((n - 1) * (n - 2)))
 
     def graph_closeness_centrality(self):
+        """Returns the closeness centrality of all vertices in a graph."""
         result = {}
         vertices = self.aList if self.representation == "LIST" else self.nameDict
         for v in vertices:
@@ -608,6 +613,7 @@ class Graph:
         return (len(vertices) - 1) / distances
     
     def graph_eccentricity(self):
+        """Returns the excentricity of all vertices in a graph."""
         result = {}
         vertices = self.aList if self.representation == "LIST" else self.nameDict
         for v in vertices:
@@ -781,6 +787,7 @@ class Graph:
         """Recursive helper for multi_dijkstra()."""
         paths = []
         def recursion(vertice, path):
+            """Recursive part of the helper."""
             if not pi[vertice]:
                 if vertice != v:
                     rPath = path[::-1]
