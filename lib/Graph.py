@@ -246,7 +246,7 @@ class Graph:
                 min_cost_vertice = vertice
         return min_cost_vertice
 
-    def dijkstra(self, start:str, end:str) -> int:
+    def dijkstra(self, start:str, end:str, w:bool = False) -> int:
         """Finds the shortest path to another vertice using dijkstra's algorithm."""
         if not self.find_vertice(start) or not self.find_vertice(end):
             return 0
@@ -276,7 +276,12 @@ class Graph:
                 break
             q.remove(currentVertice)
             for adjacency in self.get_adjacencies(currentVertice):
-                new_cost = costs[currentVertice] + self.get_weight(currentVertice, adjacency)
+                # Test
+                if not w:
+                    new_cost = costs[currentVertice] + self.get_weight(currentVertice, adjacency)
+                else:
+                    new_cost = costs[currentVertice] + 1
+                # End test
                 if new_cost < costs[adjacency]:
                     costs[adjacency] = new_cost
                     pi[adjacency] = currentVertice
@@ -520,19 +525,14 @@ class Graph:
                 vertices = self.nameDict
             ecc = 0
             for i in vertices:
-                dfs, time1 = self.depth_search(vertice, i)
-                bfs, time2 = self.width_search(vertice, i)
-                dijkstra, time3, cost = self.dijkstra(vertice, i)
-                print(f"dfs: {dfs}, bfs: {bfs}, dijkstra: {dijkstra}")
-                shortest = 0
-                if len(dfs) <= len(bfs):
-                    shortest = len(dfs)
-                else:
-                    shortest = len(bfs)
-                if len(dijkstra) < shortest:
-                    shortest = len(dijkstra)
-                if shortest > ecc:
-                    ecc = shortest
+                if i != vertice:
+                    dijkstra, time3, cost = self.dijkstra(vertice, i, True)
+                    print(f"dijkstra: {dijkstra}")
+                    shortest = 0
+                    if len(dijkstra) > shortest:
+                        shortest = len(dijkstra)
+                    if shortest > ecc:
+                        ecc = shortest
             return ecc - 1
         return None
 

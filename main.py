@@ -2,7 +2,7 @@ from lib.Parser import Parser
 from lib.Interpreter import Interpreter
 from lib.Graph import Graph
 
-parser: Parser = Parser("data/matrix.net")
+parser: Parser = Parser("data/graph.net")
 interpreter: Interpreter = Interpreter()
 extraction:dict = parser.parse()
 
