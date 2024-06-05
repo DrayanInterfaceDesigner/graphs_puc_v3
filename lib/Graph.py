@@ -1,6 +1,15 @@
 import time
 import matplotlib.pyplot as plt
 
+def measure_time(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.perf_counter()
+        result = func(*args, **kwargs)
+        end_time = time.perf_counter()
+        print(f"Execution time of {func.__name__}: {end_time - start_time} seconds")
+        return result
+    return wrapper
+
 
 class Graph:
     """Graph manipulation and representation."""
@@ -18,7 +27,7 @@ class Graph:
             self.nameDict = {}
             # {'A': 0, 'B': 1, 'C': 2}
         
-
+    @measure_time
     def find_vertice(self, name:str) -> bool:
         """Finds a vertice by name."""
         if self.representation == "LIST":
@@ -29,6 +38,7 @@ class Graph:
                 return True
         return False
 
+    @measure_time
     def find_edge(self, parent:str, child:str) -> bool:
         """Finds an edge in the graph using the names of the vertices it connects."""
         if not self.find_vertice(parent) or not self.find_vertice(child):
@@ -41,6 +51,7 @@ class Graph:
                 return True
         return False
 
+    @measure_time
     def add_vertice(self, name:str) -> None:
         """Adds a vertice to the graph."""
         if not self.find_vertice(name):
@@ -55,6 +66,7 @@ class Graph:
                     array.append(None)
                 self.aMatrix.append(arr)
 
+    @measure_time
     def add_edge(self, parent:str, child:str, weight:int|float=1) -> None:
         """Adds an edge to the graph. Takes both connected vertices as parameters."""
         if self.find_vertice(parent) and self.find_vertice(child):
@@ -69,6 +81,7 @@ class Graph:
                     if not self.directed:
                         self.aMatrix[self.nameDict[child]][self.nameDict[parent]] = weight
 
+    @measure_time
     def remove_vertice(self, name:str) -> None:
         """Removes a vertice from the graph, as well as any edges that connect to it."""
         if self.find_vertice(name):
@@ -88,6 +101,7 @@ class Graph:
                         self.nameDict[i] -= 1
                 del self.nameDict[name]
 
+    @measure_time
     def remove_edge(self, parent:str, child:str):
         """Removes an edge from the graph."""
         if self.find_vertice(parent) and self.find_vertice(child):
@@ -102,7 +116,7 @@ class Graph:
                     if not self.directed:
                         self.aMatrix[self.nameDict[child]][self.nameDict[parent]] = None
 
-
+    @measure_time
     def get_adjacencies(self, vertice:str) -> list:
         """Returns a list containing all adjacencies of the vertice."""
         if self.find_vertice(vertice):
@@ -120,7 +134,7 @@ class Graph:
                                 adjacencies[key] = self.nameDict[key]
                 return adjacencies
 
-
+    @measure_time
     def get_weight(self, parent:str, child:str) -> (int|float|None):
         """Returns the weight of an edge. Takes both connected vertices as parameters."""
         if self.find_edge(parent, child):
@@ -131,6 +145,7 @@ class Graph:
             elif self.representation == "MATRIX":
                 return self.aMatrix[self.nameDict[parent]][self.nameDict[child]]
 
+    @measure_time
     def set_weight(self, parent:str, child:str, weight:int|float) -> None:
         """Updates an edge's weight. If no such edge exists, creates it."""
         if not self.find_edge(parent, child):
@@ -144,7 +159,7 @@ class Graph:
             if not self.directed:
                 self.aMatrix[self.nameDict[child]][self.nameDict[parent]] = weight
 
-
+    @measure_time
     def out_degree(self, name:str) -> int:
         """Returns a vertice's outdegree."""
         if self.find_vertice(name):
@@ -157,6 +172,7 @@ class Graph:
                         degree += 1
                 return degree        
 
+    @measure_time
     def in_degree(self, name:str) -> int:
         """Returns a vertice's indegree."""
         if self.find_vertice(name):
@@ -175,6 +191,7 @@ class Graph:
                             degree += 1
                 return degree
 
+    @measure_time
     def degree(self, name:str) -> int:
         """Returns a vertice's degree."""
         if self.find_vertice(name):
@@ -183,7 +200,7 @@ class Graph:
             else:
                 return self.out_degree(name)
             
-    
+    @measure_time
     def depth_search(self, start:str, end:str) -> int:
         """Finds the shortest path to another vertice using a depth-based search."""
         if not self.find_vertice(start) or not self.find_vertice(end):
@@ -210,6 +227,7 @@ class Graph:
 
         return visited, total_time
 
+    @measure_time
     def width_search(self, start:str, end:str) -> int:
         """Finds the shortest path to another vertice using a width-based search."""
         if not self.find_vertice(start) or not self.find_vertice(end):
@@ -236,6 +254,7 @@ class Graph:
 
         return visited, total_time
     
+    @measure_time
     def extract_min(self, q, costs):
         """Dijkstra helper, determines min cost vertice"""
         min_cost_vertice = None
@@ -246,6 +265,7 @@ class Graph:
                 min_cost_vertice = vertice
         return min_cost_vertice
 
+    @measure_time
     def dijkstra(self, start:str, end:str, w:bool = False) -> int:
         """Finds the shortest path to another vertice using dijkstra's algorithm."""
         if not self.find_vertice(start) or not self.find_vertice(end):
@@ -297,6 +317,7 @@ class Graph:
 
         return path, total_cost, total_time
 
+    @measure_time
     def is_connected(self):
         """Returns whether a graph is connected."""
         warshall = self.warshall()
@@ -307,6 +328,7 @@ class Graph:
                     return False  
         return True
 
+    @measure_time
     def prim(self):
         """Returns a graph's minimum spanning tree using Prim's algorithm."""
         if not self.directed and self.weighted:
@@ -344,6 +366,7 @@ class Graph:
 
                 return primGraph, cost
 
+    @measure_time
     def eulerian(self):
         """Returns whether a graph is considered eulerian."""
         if self.representation == "MATRIX":
@@ -364,6 +387,7 @@ class Graph:
                 return True
             return False
 
+    @measure_time
     def warshall(self):
         """Returns an adjacency matrix representing a graph's transitive closure using Warshall's algorithm.
         
@@ -403,7 +427,7 @@ class Graph:
                 if wMatrix[i][j] != None:
                     newGraph.add_edge(names[str(i)], names[str(j)], wMatrix[i][j])
         return newGraph
-
+    
     def degree_distribution_histogram(self):
         """Plots a histogram representing the distribution of degrees throughout the graph."""
         degrees = []
@@ -504,6 +528,7 @@ class Graph:
 
 ############################# TDE 2 #################################
 
+    @measure_time
     def component_extraction(self):
         if not self.directed:
             components = []
@@ -521,6 +546,7 @@ class Graph:
             pass
         return components
 
+    @measure_time
     def graph_degree_centrality(self):
         result = {}
         vertices = self.aList if self.representation == "LIST" else self.nameDict
@@ -528,6 +554,7 @@ class Graph:
             result[v] = round(self.degree_centrality(v), 4)
         return result
 
+    @measure_time
     def degree_centrality(self, vertice:str)-> float:
         """Returns the degree centrality of a given vertice."""
         if self.representation == "LIST":
@@ -537,6 +564,7 @@ class Graph:
 
         return self.degree(vertice) / (len(vertices) - 1)
     
+    @measure_time
     def graph_betweenness_centrality(self):
         result = {}
         vertices = self.aList if self.representation == "LIST" else self.nameDict
@@ -544,6 +572,7 @@ class Graph:
             result[v] = round(self.betweenness_centrality(v), 4)
         return result
 
+    @measure_time
     def betweenness_centrality(self, v:str):
         """Returns the betweenness centrality of a given vertice."""
         if self.representation == "LIST":
@@ -568,6 +597,7 @@ class Graph:
         # print(paths)
         return ((2 * sumVar) / ((n - 1) * (n - 2)))
 
+    @measure_time
     def graph_closeness_centrality(self):
         result = {}
         vertices = self.aList if self.representation == "LIST" else self.nameDict
@@ -575,6 +605,7 @@ class Graph:
             result[v] = round(self.closeness_centrality(v), 4)
         return result
 
+    @measure_time
     def closeness_centrality(self, vertice:str):
         """Returns the closeness centrality of a given vertice."""
         if self.representation == "LIST":
@@ -591,6 +622,7 @@ class Graph:
 
         return (len(vertices) - 1) / distances
     
+    @measure_time
     def graph_eccentricity(self):
         result = {}
         vertices = self.aList if self.representation == "LIST" else self.nameDict
@@ -598,6 +630,7 @@ class Graph:
             result[v] = round(self.eccentricity(v), 4)
         return result
 
+    @measure_time
     def eccentricity(self, vertice:str):
         """Returns a given vertice's eccentricity"""
         if self.find_vertice(vertice) and self.is_connected():
@@ -618,7 +651,7 @@ class Graph:
             return ecc - 1
         return None
 
-
+    @measure_time
     def diameter(self):
         """Returns a graph's diameter."""
         if self.is_connected():
@@ -633,6 +666,7 @@ class Graph:
                     diameter = ecc
             return diameter
 
+    @measure_time
     def radius(self):
         """Returns a graph's radius."""
         if self.is_connected():
@@ -647,6 +681,7 @@ class Graph:
                     diameter = ecc
             return diameter
 
+    @measure_time
     def graph_edge_betweenness(self):
         """Returns the betweenness centrality of all edges in a graph."""
         edgeDict = {}
@@ -657,6 +692,7 @@ class Graph:
         # print(edgeDict[("A", "B")])
         return edgeDict
 
+    @measure_time
     def edge_betweenness(self, parent:str, child:str):
         """Returns the betweenness centrality of a given edge."""
         if self.representation == "LIST":
@@ -683,6 +719,7 @@ class Graph:
         # print(paths)
         return ((sumVar) / (n * (n - 1)))
     
+    @measure_time
     def all_edges(self):
         """Returns a list with all edges in a graph."""
         if self.representation == "LIST":
@@ -698,6 +735,7 @@ class Graph:
             done.append(vertice)
         return edges
 
+    @measure_time
     def geo_helper(self):
         """Returns the shortest paths between all possible vertices for use with geodesic_distance()."""
         if self.representation == "LIST":
@@ -714,6 +752,7 @@ class Graph:
             done.append(vertice)
         return geo
     
+    @measure_time
     def geodesic_distance(self):
         """Returns the sum of the distances of the shortest paths between all possible vertices."""
         distance = 0
@@ -721,11 +760,13 @@ class Graph:
             distance += (len(path) - 1)
         return distance
     
+    @measure_time
     def avg_geodesic_distance(self):
         """Returns the average geodesic distance."""
         n = (len(self.aList) if self.representation == "LIST" else len(self.aMatrix))
         return self.geodesic_distance() / ((n * (n - 1)) / 2)
 
+    @measure_time
     def girvan_newman(self, n:int):
         """Returns n subgraphs after finding communities"""
         while True:
@@ -757,6 +798,7 @@ class Graph:
             subgraphs.append(g)
         return subgraphs
 
+    @measure_time
     def multi_dijkstra_helper(self, v, pi):
         """Recursive helper for multi_dijkstra()."""
         paths = []
@@ -773,6 +815,7 @@ class Graph:
         recursion(v, [v])
         return paths
 
+    @measure_time
     def multi_dijkstra(self, start:str):
         """Uses dijkstra's algorithm to find all possible shortest paths between a vertice and other vertices."""
         if self.find_vertice(start):
@@ -804,6 +847,7 @@ class Graph:
                         paths.append(p)
             return paths # With duplicates!
     
+    @measure_time
     def all_paths(self):
         """Returns all shortest paths between every possible combination of vertices."""
         if self.representation == "LIST":
@@ -819,7 +863,8 @@ class Graph:
                         shortest.append(paths)
                 done.append(v)
             return shortest
-        
+
+    @measure_time 
     def extraction_search(self, vertice:str, visited:set):
         """Component extraction DFS helper."""
         component = []
