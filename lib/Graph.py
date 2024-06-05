@@ -526,6 +526,19 @@ class Graph:
         elif self.directed:
             pass
         return components
+    
+    def create_subgraphs(self):
+        subgraphs = []
+        components = self.component_extraction()
+        for i in components:
+            g = Graph(self.directed, self.weighted, self.representation)
+            for vertice in i:
+                g.add_vertice(vertice)
+            edges = self.all_edges()
+            for edge in edges:
+                g.add_edge(edge[0], edge[1])
+            subgraphs.append(g)
+        return subgraphs
 
     @measure_time
     def graph_degree_centrality(self):
@@ -744,7 +757,7 @@ class Graph:
     @measure_time
     def avg_geodesic_distance(self):
         """Returns the average geodesic distance."""
-        n = (len(self.aList) if self.representation == "LIST" else len(self.aMatrix))
+        n = (len(self.aList) if self.representation == "LIST" else len(self.nameDict))
         return self.geodesic_distance() / ((n * (n - 1)) / 2)
 
     @measure_time
