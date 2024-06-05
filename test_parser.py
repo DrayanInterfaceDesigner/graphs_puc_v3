@@ -2,6 +2,14 @@ from lib.Parser import Parser
 from lib.Interpreter import Interpreter
 from lib.Graph import Graph
 import time
+import multiprocessing
+import copy
+from datetime import datetime
+
+def write_results_to_txt(results, filename):
+    with open(filename, 'w') as f:
+        for result in results:
+            f.write(f"{result}\n")
 
 def measure_time(func):
     def wrapper(*args, **kwargs):
@@ -12,6 +20,7 @@ def measure_time(func):
         return result
     return wrapper
 
+save_path = f"data/{datetime.now().strftime('%Y%m%d%H%M%S')}_results.txt"
 p = Parser('data/tabela_artigos_limpa.csv')
 
 interpreter: Interpreter = Interpreter()
@@ -23,7 +32,8 @@ graph = interpreter.build(extraction)
 
 # 1) 
 @measure_time
-def most_productive():
+def most_productive(graph):
+    print("== Question 1 ==")
     pairs = []
     for vertice in (graph.aList if graph.representation == "LIST" else graph.nameDict):
         adjacencies = graph.get_adjacencies(vertice)
@@ -31,7 +41,13 @@ def most_productive():
             weight = graph.get_weight(vertice, adjacency)
             if not any((v == vertice and w == adjacency) or (v == adjacency and w == vertice) for v, w, p in pairs):
                 pairs.append((vertice, adjacency, weight))
-    return sorted(pairs, key=lambda x: x[2], reverse=True)[:10]
+    results = sorted(pairs, key=lambda x: x[2], reverse=True)[:20]
+    print(results)
+    write_results_to_txt(results, save_path)
+    print("========================================")
+    return results
+gc_1 = copy.deepcopy(graph)
+process_1 = multiprocessing.Process(target=most_productive, args=(gc_1,))
 
 # print(most_productive())
 
@@ -45,21 +61,56 @@ def most_productive():
 # print(sorted(graph.graph_degree_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
 
 # 5) demora pa um caray
-print(sorted(graph.graph_betweenness_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
+
+@measure_time
+def question5(graph):
+    print("== Question 5 ==")
+    result = sorted(graph.graph_betweenness_centrality().items(), key=lambda x: x[1], reverse=True)[:20]
+    print(result)
+    write_results_to_txt(result, save_path)
+    print("========================================")
+    return result
+gc_5 = copy.deepcopy(graph)
+process_5 = multiprocessing.Process(target=question5, args=(gc_5,))
+
+# print(sorted(graph.graph_betweenness_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
 
 # 6) demora pa um caray 2: o retorno
-print(sorted(graph.graph_closeness_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
+@measure_time
+def question6(graph):
+    print("== Question 6 ==")
+    result = sorted(graph.graph_closeness_centrality().items(), key=lambda x: x[1], reverse=True)[:20]
+    print(result)
+    write_results_to_txt(result, save_path)
+    print("========================================")
+    return result
+gc_6 = copy.deepcopy(graph)
+process_6 = multiprocessing.Process(target=question6, args=(gc_6,))
+
+# print(sorted(graph.graph_closeness_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
 
 # 7) demora pa um caray 3 e olha que eu nem botei os outros 4 subgrafos pra rodar. saporra nem chegou no pogger
 # como o grafo nao eh conexo a função não pode rodar. Sendo assim, precisamos repartir o grafo em subgrafos e executar um por um (deus tende piedade de nós)
-sub = graph.girvan_newman(5) # 5 componentes que nem a gente viu na questão 2
-print("pogger!")
-print(sorted(sub[0].graph_closeness_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
+# sub = graph.girvan_newman(5) # 5 componentes que nem a gente viu na questão 2
+# print("pogger!")
+# print(sorted(sub[0].graph_closeness_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
+
+@measure_time
+def question7(graph):
+    print("== Question 7 ==")
+    sub = graph.girvan_newman(5)
+    result = sorted(sub[0].graph_closeness_centrality().items(), key=lambda x: x[1], reverse=True)[:20]
+    print(result)
+    write_results_to_txt(result, save_path)
+    print("========================================")
+    return result
+gc_7 = copy.deepcopy(graph)
+process_7 = multiprocessing.Process(target=question7, args=(gc_7,))
 
 # 8) ver questão 7, inclusive faz até mais sentido fazer elas juntas porque a 8 depende da 7, mas é aquela coisa de que não é conexo então tem q fazer um por um.
 
 # 9)
-print(sorted(graph.graph_edge_betweenness().items(), key=lambda x: x[1], reverse=True)[:10])
+# print(sorted(graph.graph_edge_betweenness().items(), key=lambda x: x[1], reverse=True)[:10])
 
 # 10)
 # sub = graph.girvan_newman(5) # 5 componentes que nem a gente viu na questão 2
@@ -75,3 +126,7 @@ print(sorted(graph.graph_edge_betweenness().items(), key=lambda x: x[1], reverse
 
 # Temporizar essa caralha toda
 
+process_1.start()
+process_5.start()
+process_6.start()
+process_7.start()
