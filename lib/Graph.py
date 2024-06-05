@@ -296,55 +296,6 @@ class Graph:
         total_time = end_time - start_time
 
         return path, total_cost, total_time
-    
-    def DJ_kstra(self, start:str) -> list:
-        """Finds the shortest path to all other vertices using dijkstra's algorithm."""
-        if not self.find_vertice(start):
-            return 0
-        
-        if self.representation == "LIST":
-            vertices = self.aList
-        elif self.representation == "MATRIX":
-            vertices = self.nameDict
-
-        distances:dict = {v: float('inf') for v in vertices}
-        distances[start] = 0
-        visited:dict = {v: [] for v in vertices}
-        unvisited = set(vertices)
-        all_paths:dict = {}
-
-        start_time = time.perf_counter()
-
-        while unvisited:
-            current = min(unvisited, key=lambda v: distances[v])
-            unvisited.remove(current)
-            for neighbor in self.get_adjacencies(current):
-                if neighbor in unvisited:
-                    new_distance = distances[current] + self.get_weight(current, neighbor)
-                    if new_distance < distances[neighbor]:
-                        distances[neighbor] = new_distance
-                        # visited[neighbor] = visited[current] + [neighbor]
-                        visited[neighbor] = [current]
-                    elif new_distance == distances[neighbor]:
-                        visited[neighbor].append(visited[current] + [neighbor])
-        
-        for vertice in visited:
-            if vertice == start:
-                all_paths[vertice] = [start]
-            elif distances[vertice] == float('inf'):
-                all_paths[vertice] = []
-            else:
-                paths: list = [[start]]
-                while paths:
-                    path = paths.pop(0)
-                    for v in visited[path[0]]:
-                        new_path = [v] + path
-                        if v == start:
-                            all_paths[vertice] = new_path
-                        else:
-                            paths.append(new_path)
-        
-        return all_paths, time.perf_counter() - start_time
 
     def is_connected(self):
         """Returns whether a graph is connected."""
@@ -583,7 +534,7 @@ class Graph:
                 for x in vertices:
                     if x == vertice and x == v:
                         continue
-                    if vertice in all_paths[x]:
+                    if vertice in x:
                         counter += 1
                         
 
@@ -655,7 +606,13 @@ class Graph:
     def edge_betweenness(self, parent:str, child:str):
         pass
 
+    def multi_dijkstra(self, asd):
+        pass
+    
     def all_paths(self):
+        pass
+
+    def geo_helper(self):
         """Returns all shortest paths between all possible vertices."""
         if self.representation == "LIST":
             vertices = self.aList
@@ -674,7 +631,7 @@ class Graph:
     def geodesic_distance(self):
         """Returns the sum of the distances of the shortest paths between all possible vertices."""
         distance = 0
-        for path in self.all_paths():
+        for path in self.geo_helper():
             distance += (len(path) - 1)
         return distance
     
@@ -781,6 +738,16 @@ print(gM.closeness_centrality("B"))
 print(gM.closeness_centrality("C"))
 print(gM.closeness_centrality("D"))
 print(gM.closeness_centrality("E"))
+
+print("betwreenness centrality:")
+
+print(gM.betweenness_centrality("A"))
+print(gM.betweenness_centrality("B"))
+print(gM.betweenness_centrality("C"))
+print(gM.betweenness_centrality("D"))
+print(gM.betweenness_centrality("E"))
+
+print(gM.DJ_kstra("A"))
 
 
 # # print(gL.get_weight("B", "C"))
