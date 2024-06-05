@@ -43,7 +43,7 @@ def most_productive():
 # como o grafo nao eh conexo a função não pode rodar. Sendo assim, precisamos repartir o grafo em subgrafos e executar um por um (deus tende piedade de nós)
 # sub = graph.girvan_newman(5) # 5 componentes que nem a gente viu na questão 2
 # print("pogger!")
-# print(sorted(sub[0].graph_closeness_centrality().items(), key=lambda x: x[1], reverse=True)[:10])
+# print(sorted(sub[0].graph_excentricity().items(), key=lambda x: x[1], reverse=True)[:10])
 
 # 8) ver questão 7, inclusive faz até mais sentido fazer elas juntas porque a 8 depende da 7, mas é aquela coisa de que não é conexo então tem q fazer um por um.
 
