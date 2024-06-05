@@ -549,15 +549,14 @@ class Graph:
         elif self.representation == "MATRIX":
             vertices = self.nameDict
         
-        nodes_size:int = len(vertices)
-        sum_distances:float = 0.0
+        distances:int = 0
 
         for v in vertices:
             if v != vertice:
-                path, total_cost, total_time = self.dijkstra(v, vertice)
-                sum_distances += total_cost
+                path, total_cost, total_time = self.dijkstra(v, vertice, True)
+                distances += (len(path) - 1)
 
-        return (nodes_size - 1) / sum_distances
+        return (len(vertices) - 1) / distances
 
     def eccentricity(self, vertice:str):
         if self.find_vertice(vertice) and self.is_connected():
@@ -569,7 +568,7 @@ class Graph:
             for i in vertices:
                 if i != vertice:
                     dijkstra, time3, cost = self.dijkstra(vertice, i, True)
-                    print(f"dijkstra: {dijkstra}")
+                    # print(f"dijkstra: {dijkstra}")
                     shortest = 0
                     if len(dijkstra) > shortest:
                         shortest = len(dijkstra)
@@ -655,20 +654,20 @@ gM.add_vertice("D")
 gM.add_vertice("E")
 
 
+gL.add_edge("A", "B")
 gL.add_edge("A", "C")
-gL.add_edge("B", "A")
-gL.add_edge("C", "A")
+gL.add_edge("C", "B")
 gL.add_edge("C", "D")
-gL.add_edge("C", "E")
+gL.add_edge("B", "D")
 gL.add_edge("D", "E")
 # print(gL.find_edge("A", "C"))
 # print(gL.find_edge("B", "C"))
 
+gM.add_edge("A", "B")
 gM.add_edge("A", "C")
-gM.add_edge("B", "A")
-gM.add_edge("C", "A")
+gM.add_edge("C", "B")
 gM.add_edge("C", "D")
-gM.add_edge("C", "E")
+gM.add_edge("B", "D")
 gM.add_edge("D", "E")
 # print(gM.find_edge("A", "C"))
 # print(gM.find_edge("B", "C"))
