@@ -662,8 +662,11 @@ class Graph:
             elif self.representation == "MATRIX":
                 vertices = self.nameDict
             diameter = 1e10
+            # counter = 0
             for vertice in vertices:
                 ecc = self.eccentricity(vertice)
+                # print(counter)
+                # counter += 1
                 if ecc < diameter:
                     diameter = ecc
             return diameter

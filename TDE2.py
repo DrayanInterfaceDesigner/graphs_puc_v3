@@ -50,6 +50,8 @@ def components(graph):
     print("== Question 2 ==")
     return len(graph.component_extraction())
 
+# print(graph.component_extraction())
+
 # print(components(graph))
 
 # 3)
@@ -58,7 +60,7 @@ def histogram(graph):
     print("== Question 3 ==")
     graph.degree_distribution_histogram()
 
-histogram(graph)
+# histogram(graph)
 
 # 4)
 @measure_time
@@ -103,6 +105,9 @@ def exc_centrality(graph):
 @measure_time
 def radius(subgraph:Graph):
     return subgraph.radius()
+
+# sub = graph.create_subgraphs()
+# print(radius(sub[0]))
 
 @measure_time
 def diameter(subgraph:Graph):
